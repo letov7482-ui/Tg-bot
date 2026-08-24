@@ -5,57 +5,266 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Neon Hamster: Casino Tycoon</title>
     <style>
+        :root {
+            --bg: #0b0e14;
+            --card-bg: #161b26;
+            --card-border: #2a3142;
+            --text: #fff;
+            --text-muted: #8b93a7;
+            --gold: #ffd700;
+            --blue: #2196f3;
+            --green: #4caf50;
+            --red: #f44336;
+            --radius: 20px;
+            --shadow: 0 8px 30px rgba(0,0,0,0.5);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0e1116; color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        /* Верхняя панель */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #14171c; border-bottom: 1px solid #222; }
-        .user-info { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 40px; height: 40px; background: #333; border-radius: 10px; border: 2px solid #4caf50; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        .level { font-size: 12px; color: #aaa; }
-        .profit { background: #222; padding: 5px 10px; border-radius: 20px; font-size: 12px; color: #ffd700; border: 1px solid #ffd70033; }
-        .settings { font-size: 24px; color: #aaa; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: radial-gradient(circle at top, #1a1e2e, var(--bg));
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-        /* Карточки меню */
-        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
-        .menu-card { background: #1a1e26; border-radius: 15px; padding: 15px 10px; text-align: center; border: 1px solid #2a2e36; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
-        .menu-card .icon { font-size: 30px; margin-bottom: 5px; filter: drop-shadow(0 0 5px #2196f3); }
-        .menu-card .timer { font-size: 12px; color: #888; }
-        .menu-card .title { font-size: 12px; color: #ccc; margin-bottom: 5px; }
+        /* ===== Верхняя панель ===== */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            background: rgba(20,25,35,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            z-index: 50;
+        }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .avatar {
+            width: 48px; height: 48px; border-radius: 14px;
+            background: linear-gradient(145deg, #2b3040, #1a1e2a);
+            border: 2px solid var(--green);
+            box-shadow: 0 0 15px rgba(76,175,80,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+        }
+        .user-name { font-weight: 800; font-size: 16px; }
+        .user-level { font-size: 12px; color: var(--text-muted); }
+        .profit {
+            background: #1e2532;
+            padding: 8px 14px; border-radius: 30px;
+            font-size: 13px; font-weight: 700;
+            color: var(--gold);
+            border: 1px solid rgba(255,215,0,0.3);
+            display: flex; align-items: center; gap: 6px;
+            box-shadow: 0 0 15px rgba(255,215,0,0.1);
+        }
+        .profit span { font-weight: 900; }
+        .settings { font-size: 24px; color: var(--text-muted); cursor: pointer; transition: transform 0.3s; }
+        .settings:hover { transform: rotate(90deg); }
 
-        /* Центральная зона */
-        .main-zone { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .coin-display { display: flex; align-items: center; gap: 10px; font-size: 42px; font-weight: 900; color: #ffd700; text-shadow: 0 0 20px #ffd700; margin-bottom: 20px; }
-        .coin-icon { width: 40px; height: 40px; border-radius: 50%; background: #ffd700; box-shadow: 0 0 10px #ffd700; display: flex; align-items: center; justify-content: center; color: #111; font-weight: bold; font-size: 20px; }
-        
-        /* Кольцо вокруг хомяка */
-        .hamster-ring { width: 280px; height: 280px; border-radius: 50%; border: 6px solid transparent; background: linear-gradient(#0e1116, #0e1116) padding-box, linear-gradient(45deg, #2196f3, #1e2340) border-box; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(33,150,243,0.5), inset 0 0 20px rgba(33,150,243,0.3); }
-        .hamster { width: 200px; height: 200px; cursor: pointer; transition: transform 0.1s; }
+        /* ===== Сетка карточек ===== */
+        .menu-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+            padding: 16px 20px;
+        }
+        .menu-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 16px 8px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .menu-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.05), transparent);
+        }
+        .menu-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.6); }
+        .menu-card:active { transform: scale(0.97); }
+        .menu-card .icon { font-size: 36px; margin-bottom: 8px; filter: drop-shadow(0 0 15px rgba(33,150,243,0.8)); }
+        .menu-card .title { font-size: 13px; font-weight: 600; color: #b0b8c8; margin-bottom: 6px; }
+        .menu-card .timer { font-size: 12px; color: #687080; font-weight: 600; }
+
+        /* ===== Центральная зона ===== */
+        .main-zone {
+            flex: 1;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: relative; padding: 20px;
+        }
+        .coin-display {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; font-size: 48px; font-weight: 900;
+            color: var(--gold);
+            text-shadow: 0 0 30px rgba(255,215,0,0.6);
+            margin-bottom: 20px;
+        }
+        .coin-icon {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ffe082, #ffb300);
+            box-shadow: 0 0 20px rgba(255,215,0,0.9), inset 0 2px 5px rgba(255,255,255,0.6);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: #5d4037; font-weight: 900;
+        }
+
+        /* ===== Кольцо с хомяком ===== */
+        .hamster-ring {
+            width: 300px; height: 300px;
+            border-radius: 50%;
+            position: relative;
+            background: linear-gradient(145deg, #1e1e2e, #12121a);
+            padding: 8px;
+            box-shadow:
+                0 0 60px rgba(33,150,243,0.6),
+                inset 0 0 30px rgba(33,150,243,0.3);
+        }
+        .hamster-ring::before {
+            content: '';
+            position: absolute; inset: -8px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #2196f3, #1976d2, #2196f3);
+            z-index: -1;
+            animation: rotateRing 4s linear infinite;
+            filter: blur(8px);
+        }
+        .hamster-ring::after {
+            content: '';
+            position: absolute; inset: 8px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #0e1116, #1a1e2e);
+            z-index: 0;
+        }
+        @keyframes rotateRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .hamster {
+            position: relative; z-index: 1;
+            width: 270px; height: 270px;
+            cursor: pointer;
+            animation: breathe 3s ease-in-out infinite;
+            transition: transform 0.1s;
+        }
+        @keyframes breathe {
+            0%,100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
         .hamster:active { transform: scale(0.95); }
 
-        /* Нижняя панель */
-        .bottom-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #14171c; border-top: 1px solid #222; }
-        .energy { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: bold; color: #ffd700; }
-        .energy-bar { width: 150px; height: 8px; background: #333; border-radius: 5px; overflow: hidden; }
-        .energy-fill { width: 80%; height: 100%; background: linear-gradient(90deg, #ffd700, #ff8f00); }
-        .boost { background: #2196f3; padding: 10px 20px; border-radius: 20px; font-weight: bold; color: #fff; box-shadow: 0 0 10px #2196f3; cursor: pointer; }
+        /* ===== Нижняя панель ===== */
+        .bottom-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 20px;
+            background: rgba(20,25,35,0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid var(--card-border);
+            z-index: 50;
+        }
+        .energy { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: var(--gold); }
+        .energy-bar {
+            width: 160px; height: 12px;
+            background: #2a2e3a; border-radius: 10px;
+            overflow: hidden; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        .energy-fill {
+            height: 100%; width: 100%;
+            background: linear-gradient(90deg, #ff8f00, #ffd700);
+            transition: width 0.3s ease;
+        }
+        .boost {
+            background: linear-gradient(145deg, #2196f3, #1976d2);
+            padding: 12px 24px; border-radius: 30px;
+            font-weight: 800; color: #fff;
+            box-shadow: 0 8px 20px rgba(33,150,243,0.5), inset 0 2px 5px rgba(255,255,255,0.3);
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .boost:hover { transform: scale(1.05); }
+        .boost:active { transform: scale(0.95); }
 
-        /* Модальные окна */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100; }
-        .modal-content { background: #1a1e26; padding: 20px; border-radius: 20px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; border: 2px solid #2196f3; }
-        .modal-content h3 { margin-bottom: 15px; color: #ffd700; }
-        .close { float: right; font-size: 24px; cursor: pointer; color: #aaa; }
-        .item { background: #222; padding: 10px; margin: 8px 0; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .item button { background: #ffd700; border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; color: #000; font-weight: bold; }
-        .slot-machine { font-size: 48px; text-align: center; margin: 20px 0; }
-        .result { text-align: center; font-size: 18px; margin: 10px 0; }
-        .mission { display: flex; justify-content: space-between; margin: 10px 0; align-items: center; }
-        .mission button { background: #ffd700; border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; }
-        #offline-reward { display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); background: #4caf50; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 999; }
+        /* ===== Модальные окна ===== */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); justify-content: center; align-items: center;
+            z-index: 200; backdrop-filter: blur(8px);
+        }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 24px; border-radius: 24px;
+            width: 92%; max-width: 420px; max-height: 85vh; overflow-y: auto;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            position: relative;
+        }
+        .modal-content h3 { margin-bottom: 20px; color: var(--gold); font-size: 22px; font-weight: 800; }
+        .close {
+            position: absolute; top: 16px; right: 20px;
+            font-size: 28px; cursor: pointer; color: var(--text-muted);
+            transition: color 0.3s;
+        }
+        .close:hover { color: #fff; }
+        .item {
+            background: #1e2532; padding: 14px 16px; margin: 10px 0;
+            border-radius: 14px; display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid var(--card-border);
+        }
+        .item button {
+            background: var(--gold); border: none; padding: 10px 18px;
+            border-radius: 12px; cursor: pointer; font-weight: 800; color: #1a1a1a;
+            transition: transform 0.1s;
+        }
+        .item button:active { transform: scale(0.95); }
+        .slot-machine {
+            font-size: 56px; text-align: center; margin: 24px 0;
+            letter-spacing: 15px; filter: drop-shadow(0 0 15px rgba(255,215,0,0.5));
+        }
+        .result { text-align: center; font-size: 18px; margin: 16px 0; font-weight: 700; }
+        .mission {
+            display: flex; justify-content: space-between; margin: 16px 0; align-items: center;
+            background: #1e2532; padding: 14px; border-radius: 14px;
+        }
+        .mission button {
+            background: var(--gold); border: none; padding: 10px 18px;
+            border-radius: 12px; cursor: pointer; font-weight: 800;
+        }
 
-        /* Летящие цифры */
-        .floating-text { position: absolute; font-size: 24px; font-weight: 900; color: #ffd700; pointer-events: none; animation: floatUp 0.8s ease-out forwards; text-shadow: 0 2px 4px #000; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(1.5); } }
+        /* ===== Летающие цифры и частицы ===== */
+        .floating-text {
+            position: absolute; font-size: 28px; font-weight: 900;
+            color: var(--gold); pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-120px) scale(1.6); }
+        }
+
+        .particle {
+            position: absolute; width: 8px; height: 8px;
+            background: var(--gold); border-radius: 50%;
+            pointer-events: none;
+            animation: particleFly 0.8s ease-out forwards;
+        }
+        @keyframes particleFly {
+            0% { opacity: 1; transform: translate(0,0); }
+            100% { opacity: 0; transform: translate(var(--dx), var(--dy)); }
+        }
+
+        /* ===== Уведомление ===== */
+        #offline-reward {
+            display: none; position: fixed; top: 20px; left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(145deg, #4caf50, #2e7d32);
+            padding: 12px 24px; border-radius: 30px;
+            font-size: 14px; font-weight: 700;
+            z-index: 999; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
@@ -66,15 +275,15 @@
         <div class="user-info">
             <div class="avatar" id="avatar">🐹</div>
             <div>
-                <div style="font-weight: bold;">CEO (Ты)</div>
-                <div class="level">Grandmaster > 9 / 11</div>
+                <div class="user-name">CEO (Ты)</div>
+                <div class="user-level">Grandmaster > 9 / 11</div>
             </div>
         </div>
-        <div class="profit">💎 Прибыль в час: <span id="profit">+0</span></div>
+        <div class="profit">💎 <span id="profit">+0</span> / час</div>
         <div class="settings">⚙️</div>
     </div>
 
-    <!-- Карточки меню (кликабельные) -->
+    <!-- Карточки меню -->
     <div class="menu-grid">
         <div class="menu-card" onclick="openWheel()">
             <div class="icon">🎡</div>
@@ -93,28 +302,63 @@
         </div>
     </div>
 
-    <!-- Центральная зона -->
+    <!-- Центральная игровая зона -->
     <div class="main-zone" id="tapArea">
         <div class="coin-display">
             <div class="coin-icon">$</div>
             <div id="coinCount">0</div>
         </div>
 
+        <!-- Кольцо с хомяком -->
         <div class="hamster-ring" onclick="tap(event)">
+            <!-- Детализированный SVG хомяка -->
             <svg class="hamster" viewBox="0 0 200 200">
-                <path d="M60,200 C60,150 40,120 50,80 C60,50 100,40 150,50 C180,60 170,100 160,140 C150,180 150,200 150,200" fill="#111" />
-                <path d="M80,100 L120,100 L100,140" fill="#eee" />
-                <polygon points="90,100 110,100 100,160" fill="#ff9800" />
-                <ellipse cx="100" cy="60" rx="50" ry="40" fill="#e09b56" />
-                <ellipse cx="60" cy="30" rx="15" ry="10" fill="#e09b56" />
-                <ellipse cx="140" cy="30" rx="15" ry="10" fill="#e09b56" />
-                <ellipse cx="60" cy="30" rx="8" ry="5" fill="#d8955e" />
-                <ellipse cx="140" cy="30" rx="8" ry="5" fill="#d8955e" />
-                <rect x="65" y="50" width="70" height="20" rx="10" fill="#111" />
-                <rect x="60" y="48" width="80" height="4" fill="#111" />
-                <line x1="70" y1="52" x2="80" y2="62" stroke="#fff" stroke-width="2" opacity="0.3"/>
-                <line x1="120" y1="52" x2="130" y2="62" stroke="#fff" stroke-width="2" opacity="0.3"/>
-                <path d="M90,85 Q100,95 110,85" stroke="#000" stroke-width="3" fill="none" />
+                <defs>
+                    <radialGradient id="furGrad" cx="40%" cy="30%" r="60%">
+                        <stop offset="0%" style="stop-color:#f5c98a"/>
+                        <stop offset="100%" style="stop-color:#c47a3a"/>
+                    </radialGradient>
+                    <linearGradient id="suitGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#2a2a2a"/>
+                        <stop offset="100%" style="stop-color:#111"/>
+                    </linearGradient>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="blur"/>
+                        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="shadow">
+                        <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#000" flood-opacity="0.5"/>
+                    </filter>
+                </defs>
+                <!-- Ноги -->
+                <ellipse cx="75" cy="185" rx="22" ry="15" fill="#111"/>
+                <ellipse cx="125" cy="185" rx="22" ry="15" fill="#111"/>
+                <!-- Тело в костюме -->
+                <path d="M60,190 C60,140 40,110 50,80 C60,55 100,45 150,55 C180,65 170,105 160,140 C150,180 155,190 155,190" fill="url(#suitGrad)" filter="url(#shadow)"/>
+                <!-- Рубашка -->
+                <path d="M80,100 L120,100 L100,140" fill="#f0f0f0"/>
+                <!-- Галстук -->
+                <polygon points="90,100 110,100 100,160" fill="#ff9800" filter="url(#glow)"/>
+                <!-- Руки (в карманах) -->
+                <path d="M45,120 Q25,130 30,145" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/>
+                <path d="M155,120 Q175,130 170,145" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/>
+                <!-- Голова -->
+                <ellipse cx="100" cy="65" rx="58" ry="48" fill="url(#furGrad)"/>
+                <!-- Уши -->
+                <ellipse cx="55" cy="25" rx="20" ry="15" fill="#c47a3a"/>
+                <ellipse cx="145" cy="25" rx="20" ry="15" fill="#c47a3a"/>
+                <ellipse cx="55" cy="25" rx="10" ry="7" fill="#a0522d"/>
+                <ellipse cx="145" cy="25" rx="10" ry="7" fill="#a0522d"/>
+                <!-- Очки (зеркальные) -->
+                <rect x="60" y="50" width="80" height="26" rx="13" fill="rgba(0,0,0,0.85)" filter="url(#glow)"/>
+                <rect x="55" y="48" width="90" height="4" fill="#111"/>
+                <line x1="65" y1="55" x2="75" y2="70" stroke="#fff" stroke-width="2" opacity="0.4"/>
+                <line x1="130" y1="55" x2="140" y2="70" stroke="#fff" stroke-width="2" opacity="0.4"/>
+                <!-- Рот -->
+                <path d="M85,90 Q100,100 115,90" stroke="#5d4037" stroke-width="3" fill="none"/>
+                <!-- Брови -->
+                <line x1="70" y1="45" x2="85" y2="47" stroke="#5d4037" stroke-width="5"/>
+                <line x1="130" y1="45" x2="115" y2="47" stroke="#5d4037" stroke-width="5"/>
             </svg>
         </div>
     </div>
@@ -124,7 +368,7 @@
         <div class="energy">
             <span>⚡</span>
             <div class="energy-bar"><div class="energy-fill" id="energyFill"></div></div>
-            <span id="energyCount">0 / 100</span>
+            <span id="energyCount">100 / 100</span>
         </div>
         <div class="boost" onclick="activateBoost()">🚀 Boost</div>
     </div>
@@ -134,10 +378,10 @@
         <div class="modal-content">
             <span class="close" onclick="closeModal('casinoModal')">&times;</span>
             <h3>🎰 Казино</h3>
-            <p>Ставка: 100 LC</p>
+            <p style="color:#aaa; margin-bottom:10px;">Ставка: 100 LC</p>
             <div class="slot-machine" id="slot-machine">🍒 💎 7️⃣</div>
             <div class="result" id="casino-result"></div>
-            <button class="boost" onclick="spinSlot()" style="width:100%;margin-top:10px;">Крутить</button>
+            <button class="boost" onclick="spinSlot()" style="width:100%; margin-top:10px;">Крутить</button>
         </div>
     </div>
 
@@ -146,9 +390,9 @@
         <div class="modal-content">
             <span class="close" onclick="closeModal('wheelModal')">&times;</span>
             <h3>🎡 Колесо Фортуны</h3>
-            <p>Бесплатный спин каждые 24 часа</p>
+            <p style="color:#aaa; margin-bottom:10px;">Бесплатный спин каждые 24 часа</p>
             <div class="result" id="wheel-result"></div>
-            <button class="boost" onclick="spinWheel()" style="width:100%;margin-top:10px;">Крутить</button>
+            <button class="boost" onclick="spinWheel()" style="width:100%; margin-top:10px;">Крутить</button>
         </div>
     </div>
 
@@ -173,11 +417,11 @@
     <script>
         // ======== СОСТОЯНИЕ ИГРЫ ========
         let state = {
-            LC: 1000,           // Ломо-монеты
-            QC: 0,              // Квантовые чипы
+            LC: 1000,
+            QC: 0,
             energy: 100,
             maxEnergy: 100,
-            tapValue: 13,
+            tapValue: 15,
             profitPerHour: 0,
             critChance: 0.1,
             multiplier: 1,
@@ -205,10 +449,9 @@
                 const parsed = JSON.parse(saved);
                 Object.assign(state, parsed);
             }
-            // Оффлайн доход
             const now = Date.now();
             const elapsed = Math.min(2 * 3600 * 1000, now - state.lastVisit);
-            const offlineIncome = (state.robots * 20 + state.farmLevel * 50) * (elapsed / 3600000); // за час
+            const offlineIncome = (state.robots * 20 + state.farmLevel * 50) * (elapsed / 3600000);
             if (offlineIncome > 0) {
                 state.LC += offlineIncome;
                 showOfflineReward(offlineIncome);
@@ -231,180 +474,4 @@
         }
 
         function updateUI() {
-            document.getElementById('coinCount').innerText = Math.floor(state.LC).toLocaleString('ru-RU');
-            document.getElementById('energyCount').innerText = `${Math.floor(state.energy)} / ${state.maxEnergy}`;
-            document.getElementById('energyFill').style.width = (state.energy / state.maxEnergy * 100) + '%';
-            calculateProfitPerHour();
-            // Обновление скинов
-            updateHamsterSkin();
-        }
-
-        function updateHamsterSkin() {
-            let outfit = '';
-            if (state.skins.hat) outfit += '🎩';
-            if (state.skins.glasses) outfit += '🕶️';
-            if (state.skins.chain) outfit += '⛓️';
-            document.getElementById('avatar').innerText = outfit + '🐹';
-            // Визуально на SVG пока не меняем, только аватар (упрощение)
-        }
-
-        function tap(e) {
-            if (state.energy <= 0) {
-                // Можно добавить анимацию уведомления
-                return;
-            }
-            state.energy -= 1;
-            let gain = state.tapValue * state.multiplier * state.passiveMultiplier;
-            // крит
-            if (Math.random() < state.critChance) {
-                gain *= 10;
-                // маленькая анимация
-                const ring = document.querySelector('.hamster-ring');
-                ring.style.transform = 'scale(1.1)';
-                setTimeout(() => ring.style.transform = 'scale(1)', 150);
-                playSound('crit');
-            } else {
-                playSound('tap');
-            }
-            state.LC += gain;
-            state.missions.taps++;
-
-            // Летящая цифра
-            const rect = document.querySelector('.hamster-ring').getBoundingClientRect();
-            const x = (e.clientX - rect.left) - 20;
-            const y = (e.clientY - rect.top) - 40;
-            const floating = document.createElement('div');
-            floating.className = 'floating-text';
-            floating.innerText = '+' + Math.floor(gain);
-            floating.style.left = x + 'px';
-            floating.style.top = y + 'px';
-            document.querySelector('.hamster-ring').appendChild(floating);
-            setTimeout(() => floating.remove(), 800);
-
-            updateUI();
-            saveGame();
-        }
-
-        // ======== КАЗИНО ========
-        function openCasino() {
-            document.getElementById('casinoModal').style.display = 'flex';
-            document.getElementById('casino-result').textContent = '';
-        }
-
-        function spinSlot() {
-            if (state.LC < 100) {
-                alert('Недостаточно LC!');
-                return;
-            }
-            state.LC -= 100;
-            state.jackpot += 10; // прогрессивный джекпот
-            const symbols = ['🍒', '💎', '7️⃣', '🐹'];
-            const reels = [
-                symbols[Math.floor(Math.random() * symbols.length)],
-                symbols[Math.floor(Math.random() * symbols.length)],
-                symbols[Math.floor(Math.random() * symbols.length)]
-            ];
-            document.getElementById('slot-machine').textContent = reels.join(' ');
-            const resultDiv = document.getElementById('casino-result');
-            if (reels[0] === '🐹' && reels[1] === '🐹' && reels[2] === '🐹') {
-                state.LC += state.jackpot;
-                state.QC += 10;
-                resultDiv.innerHTML = `<span style="color:#ffd700;">ДЖЕКПОТ! +${state.jackpot} LC и +10 QC</span>`;
-                state.jackpot = 1000;
-                state.missions.casinoWins++;
-                playSound('win');
-            } else if (reels[0] === reels[1] && reels[1] === reels[2]) {
-                const win = 100 * 10;
-                state.LC += win;
-                resultDiv.innerHTML = `<span style="color:#4caf50;">Выигрыш ${win} LC</span>`;
-                state.missions.casinoWins++;
-                playSound('win');
-            } else if (reels[0] === reels[1] || reels[1] === reels[2] || reels[0] === reels[2]) {
-                const win = 100 * 2;
-                state.LC += win;
-                resultDiv.innerHTML = `<span style="color:#4caf50;">Выигрыш ${win} LC</span>`;
-                state.missions.casinoWins++;
-                playSound('win');
-            } else {
-                resultDiv.innerHTML = '<span style="color:#f44336;">Проигрыш</span>';
-                playSound('lose');
-            }
-            updateUI();
-            saveGame();
-        }
-
-        // ======== КОЛЕСО ФОРТУНЫ ========
-        function openWheel() {
-            document.getElementById('wheelModal').style.display = 'flex';
-            document.getElementById('wheel-result').textContent = '';
-            updateWheelTimer();
-        }
-
-        function spinWheel() {
-            const now = Date.now();
-            if (now - state.dailyWheel < 24 * 3600 * 1000) {
-                alert('Колесо будет доступно через ' + Math.ceil((24*3600*1000 - (now - state.dailyWheel))/3600000) + ' ч');
-                return;
-            }
-            state.dailyWheel = now;
-            const prizes = [
-                { type: 'LC', amount: 1000 },
-                { type: 'LC', amount: 5000 },
-                { type: 'QC', amount: 5 },
-                { type: 'MULT', amount: 2 }
-            ];
-            const prize = prizes[Math.floor(Math.random() * prizes.length)];
-            if (prize.type === 'LC') {
-                state.LC += prize.amount;
-                document.getElementById('wheel-result').innerHTML = `🎉 +${prize.amount} LC`;
-            } else if (prize.type === 'QC') {
-                state.QC += prize.amount;
-                document.getElementById('wheel-result').innerHTML = `🎉 +${prize.amount} QC`;
-            } else {
-                state.multiplierTimer = 600; // 10 минут в секундах
-                state.multiplier = prize.amount;
-                document.getElementById('wheel-result').innerHTML = `🎉 Множитель x${prize.amount} на 10 минут!`;
-            }
-            updateUI();
-            saveGame();
-        }
-
-        function updateWheelTimer() {
-            const now = Date.now();
-            const diff = state.dailyWheel + 24*3600*1000 - now;
-            if (diff <= 0) {
-                document.getElementById('wheelTimer').innerText = 'Доступно!';
-            } else {
-                const hours = Math.floor(diff / 3600000);
-                const minutes = Math.floor((diff % 3600000) / 60000);
-                document.getElementById('wheelTimer').innerText = `${hours}:${minutes.toString().padStart(2,'0')}`;
-            }
-        }
-
-        // ======== МАГАЗИН ========
-        function openShop() {
-            document.getElementById('shopModal').style.display = 'flex';
-            renderShop();
-        }
-
-        function renderShop() {
-            const container = document.getElementById('shop-items');
-            let html = '';
-            // Скины
-            if (!state.skins.hat) {
-                html += `<div class="item">Шляпа (1000 LC) <button onclick="buySkin('hat')">Купить</button></div>`;
-            }
-            if (!state.skins.glasses) {
-                html += `<div class="item">Очки (2000 LC) <button onclick="buySkin('glasses')">Купить</button></div>`;
-            }
-            if (!state.skins.chain) {
-                html += `<div class="item">Цепь (5000 LC) <button onclick="buySkin('chain')">Купить</button></div>`;
-            }
-            // Роботы
-            if (state.robots < 3) {
-                const costs = [1000, 5000, 20000];
-                html += `<div class="item">Робот ур.${state.robots+1} (${costs[state.robots]} LC) <button onclick="buyRobot()">Купить</button></div>`;
-            }
-            // Ферма
-            if (state.farmLevel < 5) {
-                c
+            document.getElementById('coinCount').innerText = Math.floor(state.LC).toLocaleString(
