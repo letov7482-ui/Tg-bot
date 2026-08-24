@@ -365,4 +365,27 @@
         }
 
         // ======== ЗАКРЫТИЕ ========
-  
+          function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // ======== ЗВУКИ (упрощённые) ========
+        function playSound(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
+                if (type === 'win') { osc.frequency.value = 600; gain.gain.setValueAtTime(0.1, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); osc.start(); osc.stop(ctx.currentTime + 0.3); }
+                else if (type === 'lose') { osc.frequency.value = 200; gain.gain.setValueAtTime(0.1, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2); osc.start(); osc.stop(ctx.currentTime + 0.2); }
+                else { osc.frequency.value = 500; gain.gain.setValueAtTime(0.05, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1); osc.start(); osc.stop(ctx.currentTime + 0.1); }
+            } catch(e) {}
+        }
+
+        // ======== TELEGRAM ========
+        if (window.Telegram && window.Telegram.WebApp) { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); }
+
+        // ======== ИНИЦИАЛИЗАЦИЯ ========
+        loadGame();
+        updateUI();
+        saveGame();
+    </script>
+</body>
+</html>
