@@ -6,136 +6,55 @@
     <title>Neon Hamster</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: radial-gradient(circle at top, #1a1e2e, #0b0e14);
-            color: #fff;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
+        body { font-family: Arial, sans-serif; background: #0b0e14; color: #fff; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
         /* Верхняя панель */
-        .top-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 14px 20px;
-            background: rgba(20,25,35,0.95);
-            border-bottom: 1px solid #2a3142;
-        }
-        .user-info { display: flex; align-items: center; gap: 12px; }
-        .avatar {
-            width: 48px; height: 48px; border-radius: 14px;
-            background: linear-gradient(145deg, #2b3040, #1a1e2a);
-            border: 2px solid #4caf50;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px;
-        }
-        .user-name { font-weight: 800; font-size: 16px; }
-        .user-level { font-size: 12px; color: #8b93a7; }
-        .profit {
-            background: #1e2532; padding: 8px 14px; border-radius: 20px;
-            font-size: 13px; font-weight: 700; color: #ffd700;
-            border: 1px solid rgba(255,215,0,0.3);
-        }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: #14171c; border-bottom: 2px solid #2a3142; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 44px; height: 44px; border-radius: 50%; background: #4caf50; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .user-name { font-weight: 800; font-size: 14px; }
+        .user-level { font-size: 11px; color: #aaa; }
+        .profit { background: #1e2532; padding: 6px 12px; border-radius: 20px; font-size: 12px; color: #ffd700; border: 1px solid #ffd70033; }
+        .settings { font-size: 22px; color: #aaa; }
 
-        /* Карточки меню */
-        .menu-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-            padding: 16px 20px;
-        }
-        .menu-card {
-            background: #161b26; border: 1px solid #2a3142; border-radius: 16px;
-            padding: 16px 8px; text-align: center;
-            cursor: pointer; transition: transform 0.2s;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-        .menu-card:hover { transform: translateY(-4px); }
-        .menu-card .icon { font-size: 36px; margin-bottom: 8px; }
+        /* Карточки */
+        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 14px; }
+        .menu-card { background: #161b26; border: 1px solid #2a3142; border-radius: 16px; padding: 14px; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+        .menu-card:active { transform: scale(0.95); }
+        .menu-card .icon { font-size: 32px; margin-bottom: 8px; }
         .menu-card .title { font-size: 13px; color: #b0b8c8; margin-bottom: 6px; }
         .menu-card .timer { font-size: 12px; color: #687080; }
 
-        /* Центральная зона */
-        .main-zone {
-            flex: 1; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            position: relative; padding: 20px;
-        }
-        .coin-display {
-            display: flex; align-items: center; gap: 12px;
-            font-size: 44px; font-weight: 900;
-            color: #ffd700; text-shadow: 0 0 30px rgba(255,215,0,0.6);
-            margin-bottom: 20px;
-        }
-        .coin-icon {
-            width: 50px; height: 50px; border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #ffe082, #ffb300);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; color: #5d4037;
-        }
+        /* Центр */
+        .main-zone { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 20px; }
+        .coin-display { display: flex; align-items: center; gap: 10px; font-size: 38px; font-weight: 900; color: #ffd700; text-shadow: 0 0 20px #ffd700; margin-bottom: 20px; }
+        .coin-icon { width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle, #ffe082, #ffb300); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #5d4037; }
 
-        /* Кольцо с хомяком */
-        .hamster-ring {
-            width: 300px; height: 300px; border-radius: 50%;
-            background: #12121a; padding: 8px;
-            box-shadow: 0 0 60px rgba(33,150,243,0.6), inset 0 0 30px rgba(33,150,243,0.3);
-            position: relative; cursor: pointer;
-        }
-        .hamster-ring::before {
-            content: ''; position: absolute; inset: -8px; border-radius: 50%;
-            background: conic-gradient(#2196f3, #1976d2, #2196f3);
-            animation: rotateRing 4s linear infinite; z-index: -1;
-        }
-        .hamster-ring::after {
-            content: ''; position: absolute; inset: 8px; border-radius: 50%;
-            background: #0e1116; z-index: 0;
-        }
-        @keyframes rotateRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .hamster { width: 270px; height: 270px; animation: breathe 3s ease-in-out infinite; }
-        @keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+        /* Хомяк */
+        .hamster-container { width: 260px; height: 260px; border-radius: 50%; background: #12121a; border: 4px solid #2196f3; box-shadow: 0 0 40px rgba(33,150,243,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+        .hamster-emoji { font-size: 120px; transition: transform 0.1s; }
+        .hamster-container:active .hamster-emoji { transform: scale(0.9); }
 
         /* Нижняя панель */
-        .bottom-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 16px 20px; background: rgba(20,25,35,0.95);
-            border-top: 1px solid #2a3142;
-        }
-        .energy { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: #ffd700; }
-        .energy-bar { width: 160px; height: 12px; background: #2a2e3a; border-radius: 10px; overflow: hidden; }
-        .energy-fill { height: 100%; background: linear-gradient(90deg, #ff8f00, #ffd700); }
-        .boost {
-            background: linear-gradient(145deg, #2196f3, #1976d2);
-            padding: 12px 24px; border-radius: 30px; font-weight: 800; color: #fff;
-            cursor: pointer; transition: transform 0.2s;
-        }
-        .boost:hover { transform: scale(1.05); }
+        .bottom-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: #14171c; border-top: 2px solid #2a3142; }
+        .energy { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: bold; color: #ffd700; }
+        .energy-bar { width: 130px; height: 10px; background: #2a2e3a; border-radius: 8px; overflow: hidden; }
+        .energy-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #ff8f00, #ffd700); }
+        .boost { background: #2196f3; padding: 10px 20px; border-radius: 20px; font-weight: 800; color: #fff; cursor: pointer; box-shadow: 0 4px 10px rgba(33,150,243,0.4); }
 
-        /* Модальные окна */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); justify-content: center; align-items: center;
-            z-index: 200;
-        }
-        .modal-content {
-            background: #161b26; padding: 24px; border-radius: 24px;
-            width: 92%; max-width: 420px; max-height: 85vh; overflow-y: auto;
-            border: 1px solid #2a3142;
-        }
+        /* Модалки */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 999; }
+        .modal-content { background: #161b26; padding: 20px; border-radius: 20px; width: 90%; max-width: 400px; border: 2px solid #2196f3; }
         .modal-content h3 { color: #ffd700; margin-bottom: 20px; }
-        .close { position: absolute; top: 16px; right: 20px; font-size: 28px; cursor: pointer; }
-        .item { background: #1e2532; padding: 12px; margin: 10px 0; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; }
-        .item button { background: #ffd700; border: none; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: 800; }
-        .slot-machine { font-size: 52px; text-align: center; margin: 24px 0; letter-spacing: 15px; }
-        .result { text-align: center; font-size: 18px; margin: 16px 0; font-weight: 700; }
-        .mission { display: flex; justify-content: space-between; margin: 16px 0; align-items: center; }
-        .mission button { background: #ffd700; border: none; padding: 8px 16px; border-radius: 10px; cursor: pointer; }
-
-        /* Анимации */
-        .floating-text { position: absolute; font-size: 28px; font-weight: 900; color: #ffd700; animation: floatUp 0.8s forwards; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
-        .particle { position: absolute; width: 8px; height: 8px; background: #ffd700; border-radius: 50%; animation: particleFly 0.8s forwards; }
-        @keyframes particleFly { 0% { opacity: 1; transform: translate(0,0); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)); } }
-        #offline-reward { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #4caf50; padding: 12px 24px; border-radius: 30px; z-index: 999; }
+        .close { float: right; font-size: 24px; cursor: pointer; }
+        .item { background: #1e2532; padding: 12px; margin: 10px 0; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .item button { background: #ffd700; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .slot-machine { font-size: 48px; text-align: center; margin: 20px 0; }
+        .result { text-align: center; font-size: 16px; margin: 10px 0; }
+        .mission { display: flex; justify-content: space-between; margin: 10px 0; align-items: center; background: #1e2532; padding: 10px; border-radius: 10px; }
+        .mission button { background: #ffd700; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+        
+        #offline-reward { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #4caf50; padding: 10px 20px; border-radius: 20px; z-index: 1000; }
     </style>
 </head>
 <body>
@@ -144,17 +63,17 @@
     <!-- Верхняя панель -->
     <div class="top-bar">
         <div class="user-info">
-            <div class="avatar" id="avatar">🐹</div>
+            <div class="avatar">🐹</div>
             <div>
-                <div class="user-name">CEO (Ты)</div>
-                <div class="user-level">Grandmaster > 9 / 11</div>
+                <div class="user-name">CEO</div>
+                <div class="user-level">Уровень 1</div>
             </div>
         </div>
         <div class="profit">💎 <span id="profit">+0</span> / час</div>
         <div class="settings">⚙️</div>
     </div>
 
-    <!-- Карточки меню -->
+    <!-- Карточки -->
     <div class="menu-grid">
         <div class="menu-card" onclick="openWheel()">
             <div class="icon">🎡</div>
@@ -164,7 +83,7 @@
         <div class="menu-card" onclick="openMissions()">
             <div class="icon">📜</div>
             <div class="title">Миссии</div>
-            <div class="timer">3/5</div>
+            <div class="timer">0/3</div>
         </div>
         <div class="menu-card" onclick="openShop()">
             <div class="icon">🛒</div>
@@ -173,60 +92,15 @@
         </div>
     </div>
 
-    <!-- Центральная зона -->
+    <!-- Центр -->
     <div class="main-zone">
         <div class="coin-display">
             <div class="coin-icon">$</div>
             <div id="coinCount">0</div>
         </div>
-
-        <div class="hamster-ring" id="hamsterRing" onclick="tap(event)">
-            <!-- Реалистичный хомяк SVG -->
-            <svg class="hamster" viewBox="0 0 200 200">
-                <defs>
-                    <radialGradient id="fur" cx="40%" cy="30%" r="60%">
-                        <stop offset="0%" style="stop-color:#f5c98a"/>
-                        <stop offset="100%" style="stop-color:#c47a3a"/>
-                    </radialGradient>
-                    <linearGradient id="suit" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style="stop-color:#2a2a2a"/>
-                        <stop offset="100%" style="stop-color:#111"/>
-                    </linearGradient>
-                    <filter id="glow">
-                        <feGaussianBlur stdDeviation="3" result="blur"/>
-                        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                    </filter>
-                </defs>
-                <!-- Ноги -->
-                <ellipse cx="75" cy="185" rx="22" ry="15" fill="#111"/>
-                <ellipse cx="125" cy="185" rx="22" ry="15" fill="#111"/>
-                <!-- Тело в костюме -->
-                <path d="M60,190 C60,140 40,110 50,80 C60,55 100,45 150,55 C180,65 170,105 160,140 C150,180 155,190 155,190" fill="url(#suit)"/>
-                <!-- Рубашка -->
-                <path d="M80,100 L120,100 L100,140" fill="#f0f0f0"/>
-                <!-- Галстук -->
-                <polygon points="90,100 110,100 100,160" fill="#ff9800" filter="url(#glow)"/>
-                <!-- Руки -->
-                <path d="M45,120 Q25,130 30,145" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/>
-                <path d="M155,120 Q175,130 170,145" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/>
-                <!-- Голова -->
-                <ellipse cx="100" cy="65" rx="58" ry="48" fill="url(#fur)"/>
-                <!-- Уши -->
-                <ellipse cx="55" cy="25" rx="20" ry="15" fill="#c47a3a"/>
-                <ellipse cx="145" cy="25" rx="20" ry="15" fill="#c47a3a"/>
-                <ellipse cx="55" cy="25" rx="10" ry="7" fill="#a0522d"/>
-                <ellipse cx="145" cy="25" rx="10" ry="7" fill="#a0522d"/>
-                <!-- Очки -->
-                <rect x="60" y="50" width="80" height="26" rx="13" fill="rgba(0,0,0,0.85)"/>
-                <rect x="55" y="48" width="90" height="4" fill="#111"/>
-                <line x1="65" y1="55" x2="75" y2="70" stroke="#fff" stroke-width="2" opacity="0.4"/>
-                <line x1="130" y1="55" x2="140" y2="70" stroke="#fff" stroke-width="2" opacity="0.4"/>
-                <!-- Рот -->
-                <path d="M85,90 Q100,100 115,90" stroke="#5d4037" stroke-width="3" fill="none"/>
-                <!-- Брови -->
-                <line x1="70" y1="45" x2="85" y2="47" stroke="#5d4037" stroke-width="5"/>
-                <line x1="130" y1="45" x2="115" y2="47" stroke="#5d4037" stroke-width="5"/>
-            </svg>
+        <!-- Хомяк (просто эмодзи, без сложного SVG) -->
+        <div class="hamster-container" id="hamster" onclick="tap(event)">
+            <div class="hamster-emoji">🐹</div>
         </div>
     </div>
 
@@ -235,35 +109,33 @@
         <div class="energy">
             <span>⚡</span>
             <div class="energy-bar"><div class="energy-fill" id="energyFill"></div></div>
-            <span id="energyCount">100 / 100</span>
+            <span id="energyCount">100/100</span>
         </div>
         <div class="boost" onclick="activateBoost()">🚀 Boost</div>
     </div>
 
-    <!-- Модалка Казино -->
+    <!-- Модалки -->
     <div class="modal" id="casinoModal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('casinoModal')">&times;</span>
             <h3>🎰 Казино</h3>
-            <p style="color:#aaa; margin-bottom:10px;">Ставка: 100 LC</p>
+            <p>Ставка: 100 LC</p>
             <div class="slot-machine" id="slot-machine">🍒 💎 7️⃣</div>
             <div class="result" id="casino-result"></div>
-            <button class="boost" onclick="spinSlot()" style="width:100%; margin-top:10px;">Крутить</button>
+            <button onclick="spinSlot()" style="background:#ffd700;border:none;padding:10px;border-radius:10px;width:100%;cursor:pointer;">Крутить</button>
         </div>
     </div>
 
-    <!-- Модалка Колесо -->
     <div class="modal" id="wheelModal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('wheelModal')">&times;</span>
             <h3>🎡 Колесо Фортуны</h3>
-            <p style="color:#aaa; margin-bottom:10px;">Бесплатный спин каждые 24 часа</p>
+            <p>Каждые 24 часа бесплатно</p>
             <div class="result" id="wheel-result"></div>
-            <button class="boost" onclick="spinWheel()" style="width:100%; margin-top:10px;">Крутить</button>
+            <button onclick="spinWheel()" style="background:#ffd700;border:none;padding:10px;border-radius:10px;width:100%;cursor:pointer;">Крутить</button>
         </div>
     </div>
 
-    <!-- Модалка Магазин -->
     <div class="modal" id="shopModal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('shopModal')">&times;</span>
@@ -272,11 +144,10 @@
         </div>
     </div>
 
-    <!-- Модалка Миссии -->
     <div class="modal" id="missionsModal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('missionsModal')">&times;</span>
-            <h3>📜 Ежедневные миссии</h3>
+            <h3>📜 Миссии</h3>
             <div id="missions-list"></div>
         </div>
     </div>
@@ -300,28 +171,19 @@
             dailyWheel: 0,
             lastVisit: Date.now(),
             jackpot: 1000,
-            discountTimer: 0,
             passiveMultiplier: 1,
         };
 
-        // ======== ЗАГРУЗКА / СОХРАНЕНИЕ ========
-        function saveGame() {
-            localStorage.setItem('neonHamster', JSON.stringify(state));
-        }
+        // ======== СОХРАНЕНИЕ ========
+        function saveGame() { localStorage.setItem('neonHamster', JSON.stringify(state)); }
 
         function loadGame() {
             const saved = localStorage.getItem('neonHamster');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                Object.assign(state, parsed);
-            }
+            if (saved) { Object.assign(state, JSON.parse(saved)); }
             const now = Date.now();
             const elapsed = Math.min(2 * 3600 * 1000, now - state.lastVisit);
             const offlineIncome = (state.robots * 20 + state.farmLevel * 50) * (elapsed / 3600000);
-            if (offlineIncome > 0) {
-                state.LC += offlineIncome;
-                showOfflineReward(offlineIncome);
-            }
+            if (offlineIncome > 0) { state.LC += offlineIncome; showOfflineReward(offlineIncome); }
             state.lastVisit = now;
             calculateProfitPerHour();
         }
@@ -333,7 +195,7 @@
             setTimeout(() => el.style.display = 'none', 5000);
         }
 
-        // ======== ОСНОВНЫЕ ========
+        // ======== ОБНОВЛЕНИЕ UI ========
         function calculateProfitPerHour() {
             state.profitPerHour = state.robots * 100 + state.farmLevel * 250;
             document.getElementById('profit').innerText = '+' + Math.floor(state.profitPerHour).toLocaleString('ru-RU');
@@ -344,76 +206,58 @@
             document.getElementById('energyCount').innerText = `${Math.floor(state.energy)} / ${state.maxEnergy}`;
             document.getElementById('energyFill').style.width = (state.energy / state.maxEnergy * 100) + '%';
             calculateProfitPerHour();
-            updateHamsterSkin();
+            updateAvatar();
         }
 
-        function updateHamsterSkin() {
+        function updateAvatar() {
             let outfit = '';
             if (state.skins.hat) outfit += '🎩';
             if (state.skins.glasses) outfit += '🕶️';
             if (state.skins.chain) outfit += '⛓️';
-            document.getElementById('avatar').innerText = outfit + '🐹';
+            document.querySelector('.avatar').innerText = outfit + '🐹';
         }
 
+        // ======== ТАП ========
         function tap(e) {
-            if (state.energy <= 0) return;
+            if (state.energy <= 0) { alert('Энергия закончилась!'); return; }
             state.energy -= 1;
             let gain = state.tapValue * state.multiplier * state.passiveMultiplier;
-            if (Math.random() < state.critChance) {
-                gain *= 10;
-                const ring = document.getElementById('hamsterRing');
-                ring.style.transform = 'scale(1.1)';
-                setTimeout(() => ring.style.transform = 'scale(1)', 150);
-                playSound('crit');
-                if (navigator.vibrate) navigator.vibrate(100);
-            } else {
-                playSound('tap');
-                if (navigator.vibrate) navigator.vibrate(30);
-            }
+            if (Math.random() < state.critChance) { gain *= 10; }
             state.LC += gain;
             state.missions.taps++;
-
-            // Эффекты
-            const rect = document.getElementById('hamsterRing').getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            // Летящий текст
+            
+            // Эффект (просто меняем размер)
+            const hamster = document.getElementById('hamster');
+            hamster.style.transform = 'scale(0.92)';
+            setTimeout(() => hamster.style.transform = 'scale(1)', 100);
+            
+            // Всплывающая цифра
+            const rect = hamster.getBoundingClientRect();
+            const x = e.clientX - rect.left - 20;
+            const y = e.clientY - rect.top - 30;
             const floating = document.createElement('div');
-            floating.className = 'floating-text';
-            floating.innerText = '+' + Math.floor(gain);
-            floating.style.left = (x - 20) + 'px';
-            floating.style.top = (y - 40) + 'px';
-            document.getElementById('hamsterRing').appendChild(floating);
-            setTimeout(() => floating.remove(), 800);
-
-            // Частицы
-            for (let i = 0; i < 5; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = x + 'px';
-                particle.style.top = y + 'px';
-                particle.style.setProperty('--dx', (Math.random() * 80 - 40) + 'px');
-                particle.style.setProperty('--dy', (Math.random() * -60 - 20) + 'px');
-                document.getElementById('hamsterRing').appendChild(particle);
-                setTimeout(() => particle.remove(), 800);
-            }
-
+            floating.style.position = 'absolute';
+            floating.style.left = x + 'px';
+            floating.style.top = y + 'px';
+            floating.style.fontSize = '24px';
+            floating.style.fontWeight = 'bold';
+            floating.style.color = '#ffd700';
+            floating.style.pointerEvents = 'none';
+            floating.style.transition = 'opacity 0.5s, transform 0.5s';
+            floating.innerText = '+' + gain;
+            hamster.appendChild(floating);
+            setTimeout(() => { floating.style.opacity = '0'; floating.style.transform = 'translateY(-50px)'; }, 50);
+            setTimeout(() => floating.remove(), 600);
+            
             updateUI();
             saveGame();
         }
 
         // ======== КАЗИНО ========
-        function openCasino() {
-            document.getElementById('casinoModal').style.display = 'flex';
-            document.getElementById('casino-result').textContent = '';
-        }
+        function openCasino() { document.getElementById('casinoModal').style.display = 'flex'; document.getElementById('casino-result').textContent = ''; }
 
         function spinSlot() {
-            if (state.LC < 100) {
-                alert('Недостаточно LC!');
-                return;
-            }
+            if (state.LC < 100) { alert('Недостаточно LC!'); return; }
             state.LC -= 100;
             state.jackpot += 10;
             const symbols = ['🍒', '💎', '7️⃣', '🐹'];
@@ -425,15 +269,100 @@
             document.getElementById('slot-machine').textContent = reels.join(' ');
             const resultDiv = document.getElementById('casino-result');
             if (reels[0] === '🐹' && reels[1] === '🐹' && reels[2] === '🐹') {
-                state.LC += state.jackpot;
-                state.QC += 10;
-                resultDiv.innerHTML = `<span style="color:#ffd700;">ДЖЕКПОТ! +${state.jackpot} LC и +10 QC</span>`;
-                state.jackpot = 1000;
-                state.missions.casinoWins++;
-                playSound('win');
+                state.LC += state.jackpot; state.QC += 10;
+                resultDiv.innerHTML = `<span style="color:#ffd700;">ДЖЕКПОТ! +${state.jackpot} LC</span>`;
+                state.jackpot = 1000; state.missions.casinoWins++; playSound('win');
             } else if (reels[0] === reels[1] && reels[1] === reels[2]) {
-                const win = 100 * 10;
-                state.LC += win;
+                const win = 100 * 10; state.LC += win;
                 resultDiv.innerHTML = `<span style="color:#4caf50;">Выигрыш ${win} LC</span>`;
-                state.missions.casinoWins++;
-                pl
+                state.missions.casinoWins++; playSound('win');
+            } else if (reels[0] === reels[1] || reels[1] === reels[2] || reels[0] === reels[2]) {
+                const win = 100 * 2; state.LC += win;
+                resultDiv.innerHTML = `<span style="color:#4caf50;">Выигрыш ${win} LC</span>`;
+                state.missions.casinoWins++; playSound('win');
+            } else {
+                resultDiv.innerHTML = '<span style="color:#f44336;">Проигрыш</span>'; playSound('lose');
+            }
+            updateUI(); saveGame();
+        }
+
+        // ======== КОЛЕСО ========
+        function openWheel() { document.getElementById('wheelModal').style.display = 'flex'; document.getElementById('wheel-result').textContent = ''; }
+
+        function spinWheel() {
+            const now = Date.now();
+            if (now - state.dailyWheel < 24 * 3600 * 1000) { alert('Колесо будет доступно через ' + Math.ceil((24*3600*1000 - (now - state.dailyWheel))/3600000) + ' ч'); return; }
+            state.dailyWheel = now;
+            const prizes = [{ type: 'LC', amount: 1000 }, { type: 'LC', amount: 5000 }, { type: 'QC', amount: 5 }, { type: 'MULT', amount: 2 }];
+            const prize = prizes[Math.floor(Math.random() * prizes.length)];
+            if (prize.type === 'LC') { state.LC += prize.amount; document.getElementById('wheel-result').innerHTML = `🎉 +${prize.amount} LC`; }
+            else if (prize.type === 'QC') { state.QC += prize.amount; document.getElementById('wheel-result').innerHTML = `🎉 +${prize.amount} QC`; }
+            else { state.multiplierTimer = 600; state.multiplier = prize.amount; document.getElementById('wheel-result').innerHTML = `🎉 Множитель x${prize.amount} на 10 минут!`; }
+            updateUI(); saveGame();
+        }
+
+        // ======== МАГАЗИН ========
+        function openShop() { document.getElementById('shopModal').style.display = 'flex'; renderShop(); }
+
+        function renderShop() {
+            const c = document.getElementById('shop-items');
+            let html = '';
+            if (!state.skins.hat) html += `<div class="item">Шляпа (1000 LC) <button onclick="buySkin('hat')">Купить</button></div>`;
+            if (!state.skins.glasses) html += `<div class="item">Очки (2000 LC) <button onclick="buySkin('glasses')">Купить</button></div>`;
+            if (!state.skins.chain) html += `<div class="item">Цепь (5000 LC) <button onclick="buySkin('chain')">Купить</button></div>`;
+            if (state.robots < 3) { const costs = [1000, 5000, 20000]; html += `<div class="item">Робот ур.${state.robots+1} (${costs[state.robots]} LC) <button onclick="buyRobot()">Купить</button></div>`; }
+            if (state.farmLevel < 5) { const cost = 2000 * (state.farmLevel + 1); html += `<div class="item">Ферма ур.${state.farmLevel+1} (${cost} LC) <button onclick="buyFarm()">Купить</button></div>`; }
+            c.innerHTML = html;
+        }
+
+        function buySkin(type) {
+            const prices = { hat: 1000, glasses: 2000, chain: 5000 };
+            if (state.LC < prices[type]) { alert('Не хватает LC'); return; }
+            state.LC -= prices[type]; state.skins[type] = true;
+            if (type === 'hat') state.maxEnergy += 50;
+            if (type === 'glasses') state.critChance = 0.25;
+            if (type === 'chain') state.robots += 1;
+            updateUI(); saveGame(); renderShop();
+        }
+
+        function buyRobot() { const costs = [1000, 5000, 20000]; if (state.robots >= 3) return; const cost = costs[state.robots]; if (state.LC < cost) { alert('Не хватает LC'); return; } state.LC -= cost; state.robots++; updateUI(); saveGame(); renderShop(); }
+
+        function buyFarm() { if (state.farmLevel >= 5) return; const cost = 2000 * (state.farmLevel + 1); if (state.LC < cost) { alert('Не хватает LC'); return; } state.LC -= cost; state.farmLevel++; updateUI(); saveGame(); renderShop(); }
+
+        // ======== МИССИИ ========
+        function openMissions() { document.getElementById('missionsModal').style.display = 'flex'; renderMissions(); }
+
+        function renderMissions() {
+            const list = document.getElementById('missions-list');
+            let html = '';
+            if (state.missions.taps >= 50) { html += `<div class="mission">Сделать 50 тапов <button onclick="claimMission(1)">Забрать +500 LC</button></div>`; }
+            else { html += `<div class="mission">Сделать 50 тапов (${state.missions.taps}/50)</div>`; }
+            if (state.missions.casinoWins >= 3) { html += `<div class="mission">Выиграть 3 раза в казино <button onclick="claimMission(2)">Забрать +2 QC</button></div>`; }
+            else { html += `<div class="mission">Выиграть 3 раза в казино (${state.missions.casinoWins}/3)</div>`; }
+            list.innerHTML = html;
+        }
+
+        function claimMission(num) {
+            if (num === 1 && state.missions.taps >= 50) { state.LC += 500; state.missions.taps = 0; }
+            if (num === 2 && state.missions.casinoWins >= 3) { state.QC += 2; state.missions.casinoWins = 0; }
+            updateUI(); saveGame(); renderMissions();
+        }
+
+        // ======== ПАССИВНЫЙ ДОХОД ========
+        setInterval(() => {
+            const passive = (state.robots * 100 + state.farmLevel * 250) * state.multiplier;
+            state.LC += passive / 3600;
+            if (state.energy < state.maxEnergy) { state.energy += 1; if (state.energy > state.maxEnergy) state.energy = state.maxEnergy; }
+            if (state.multiplierTimer > 0) { state.multiplierTimer--; if (state.multiplierTimer === 0) state.multiplier = 1; }
+            updateUI(); saveGame();
+        }, 1000);
+
+        // ======== БУСТ ========
+        function activateBoost() {
+            if (state.energy < 50) { alert('Нужно 50 энергии для буста!'); return; }
+            state.energy -= 50; state.multiplier = 2; state.multiplierTimer = 60;
+            alert('Буст активирован: x2 на 1 минуту!'); updateUI(); saveGame();
+        }
+
+        // ======== ЗАКРЫТИЕ ========
+  
