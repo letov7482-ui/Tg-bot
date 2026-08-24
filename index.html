@@ -3,58 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neon Hamster</title>
+    <title>NEON HAMSTER: CASINO TYCOON</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: Arial, sans-serif; background: #0b0e14; color: #fff; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        /* Верхняя панель */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: #14171c; border-bottom: 2px solid #2a3142; }
-        .user-info { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 44px; height: 44px; border-radius: 50%; background: #4caf50; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        .user-name { font-weight: 800; font-size: 14px; }
-        .user-level { font-size: 11px; color: #aaa; }
-        .profit { background: #1e2532; padding: 6px 12px; border-radius: 20px; font-size: 12px; color: #ffd700; border: 1px solid #ffd70033; }
-        .settings { font-size: 22px; color: #aaa; }
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle at top, #0f1a2b, #050a12);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-        /* Карточки */
-        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 14px; }
-        .menu-card { background: #161b26; border: 1px solid #2a3142; border-radius: 16px; padding: 14px; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
-        .menu-card:active { transform: scale(0.95); }
-        .menu-card .icon { font-size: 32px; margin-bottom: 8px; }
-        .menu-card .title { font-size: 13px; color: #b0b8c8; margin-bottom: 6px; }
-        .menu-card .timer { font-size: 12px; color: #687080; }
+        /* ===== Верхняя панель ===== */
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 20px;
+            background: rgba(10,15,25,0.95);
+            border-bottom: 2px solid #2a3a50;
+        }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .avatar {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: linear-gradient(145deg, #2a3a50, #1a2535);
+            border: 2px solid #ffd700;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 0 20px rgba(255,215,0,0.4);
+        }
+        .user-name { font-weight: 800; font-size: 16px; }
+        .user-level { font-size: 12px; color: #9aa8bd; }
+        .profit {
+            background: #1e2a3a; padding: 8px 16px; border-radius: 20px;
+            font-size: 13px; font-weight: 700; color: #ffd700;
+            border: 1px solid rgba(255,215,0,0.3);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .settings { font-size: 26px; color: #9aa8bd; cursor: pointer; transition: transform 0.3s; }
+        .settings:hover { transform: rotate(90deg); }
 
-        /* Центр */
-        .main-zone { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 20px; }
-        .coin-display { display: flex; align-items: center; gap: 10px; font-size: 38px; font-weight: 900; color: #ffd700; text-shadow: 0 0 20px #ffd700; margin-bottom: 20px; }
-        .coin-icon { width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle, #ffe082, #ffb300); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #5d4037; }
+        /* ===== Карточки меню ===== */
+        .menu-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+            padding: 16px 20px;
+        }
+        .menu-card {
+            background: linear-gradient(145deg, #16202e, #1e2a3a);
+            border: 1px solid #2a3a50;
+            border-radius: 20px;
+            padding: 18px 8px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+        .menu-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.08), transparent);
+        }
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        }
+        .menu-card:active { transform: scale(0.96); }
+        .menu-card .icon { font-size: 44px; margin-bottom: 10px; filter: drop-shadow(0 0 15px rgba(33,150,243,0.8)); }
+        .menu-card .title { font-size: 14px; font-weight: 700; color: #d0d8e8; margin-bottom: 6px; }
+        .menu-card .timer { font-size: 12px; color: #7a8a9a; font-weight: 600; }
 
-        /* Хомяк */
-        .hamster-container { width: 260px; height: 260px; border-radius: 50%; background: #12121a; border: 4px solid #2196f3; box-shadow: 0 0 40px rgba(33,150,243,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
-        .hamster-emoji { font-size: 120px; transition: transform 0.1s; }
-        .hamster-container:active .hamster-emoji { transform: scale(0.9); }
+        /* ===== Центральная зона ===== */
+        .main-zone {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: relative; padding: 20px;
+        }
+        .coin-display {
+            display: flex; align-items: center; gap: 14px;
+            font-size: 56px; font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 35px rgba(255,215,0,0.7), 0 4px 15px rgba(0,0,0,0.6);
+            margin-bottom: 24px;
+        }
+        .coin-icon {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ffe082, #ffb300);
+            box-shadow: 0 0 30px rgba(255,215,0,0.9), inset 0 3px 8px rgba(255,255,255,0.6);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; color: #5d4037;
+        }
 
-        /* Нижняя панель */
-        .bottom-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: #14171c; border-top: 2px solid #2a3142; }
-        .energy { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: bold; color: #ffd700; }
-        .energy-bar { width: 130px; height: 10px; background: #2a2e3a; border-radius: 8px; overflow: hidden; }
-        .energy-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #ff8f00, #ffd700); }
-        .boost { background: #2196f3; padding: 10px 20px; border-radius: 20px; font-weight: 800; color: #fff; cursor: pointer; box-shadow: 0 4px 10px rgba(33,150,243,0.4); }
+        /* ===== Хомяк ===== */
+        .hamster-ring {
+            width: 340px; height: 340px; border-radius: 50%;
+            background: #0e1420; padding: 12px;
+            position: relative;
+            box-shadow: 0 0 80px rgba(33,150,243,0.6), inset 0 0 40px rgba(0,0,0,0.6);
+        }
+        .hamster-ring::before {
+            content: '';
+            position: absolute; inset: -12px; border-radius: 50%;
+            background: conic-gradient(#ffd700, #ff9800, #ffd700, #ff9800, #ffd700);
+            animation: rotateRing 3s linear infinite;
+            z-index: -1; filter: blur(12px);
+        }
+        .hamster-ring::after {
+            content: '';
+            position: absolute; inset: 12px; border-radius: 50%;
+            background: radial-gradient(circle, #1e2a3a, #0e1420);
+            z-index: 0;
+        }
+        .hamster {
+            width: 310px; height: 310px; cursor: pointer;
+            position: relative; z-index: 1;
+            transition: transform 0.1s;
+            animation: breathe 3s ease-in-out infinite;
+        }
+        .hamster:active { transform: scale(0.94); }
+        @keyframes rotateRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03); } }
 
-        /* Модалки */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 999; }
-        .modal-content { background: #161b26; padding: 20px; border-radius: 20px; width: 90%; max-width: 400px; border: 2px solid #2196f3; }
-        .modal-content h3 { color: #ffd700; margin-bottom: 20px; }
-        .close { float: right; font-size: 24px; cursor: pointer; }
-        .item { background: #1e2532; padding: 12px; margin: 10px 0; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .item button { background: #ffd700; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .slot-machine { font-size: 48px; text-align: center; margin: 20px 0; }
-        .result { text-align: center; font-size: 16px; margin: 10px 0; }
-        .mission { display: flex; justify-content: space-between; margin: 10px 0; align-items: center; background: #1e2532; padding: 10px; border-radius: 10px; }
-        .mission button { background: #ffd700; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
-        
-        #offline-reward { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #4caf50; padding: 10px 20px; border-radius: 20px; z-index: 1000; }
+        /* ===== Нижняя панель ===== */
+        .bottom-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 20px; background: rgba(10,15,25,0.95);
+            border-top: 2px solid #2a3a50;
+        }
+        .energy { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: #ffd700; }
+        .energy-bar { width: 190px; height: 14px; background: #2a3a50; border-radius: 10px; overflow: hidden; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        .energy-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #ff8f00, #ffd700); transition: width 0.3s; }
+        .boost {
+            background: linear-gradient(145deg, #ff9800, #f57c00);
+            padding: 14px 30px; border-radius: 30px;
+            font-weight: 900; color: #fff;
+            box-shadow: 0 8px 25px rgba(255,152,0,0.5), inset 0 2px 5px rgba(255,255,255,0.4);
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .boost:hover { transform: scale(1.05); }
+        .boost:active { transform: scale(0.95); }
+
+        /* ===== Модалки ===== */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 999; backdrop-filter: blur(6px); }
+        .modal-content { background: linear-gradient(145deg, #16202e, #1e2a3a); padding: 28px; border-radius: 28px; width: 92%; max-width: 440px; max-height: 88vh; overflow-y: auto; border: 2px solid #ffd700; box-shadow: 0 25px 60px rgba(0,0,0,0.7); }
+        .modal-content h3 { color: #ffd700; font-size: 24px; font-weight: 900; margin-bottom: 20px; }
+        .close { position: absolute; top: 20px; right: 20px; font-size: 30px; cursor: pointer; color: #9aa8bd; transition: color 0.3s; }
+        .close:hover { color: #fff; }
+        .item { background: #1e2a3a; padding: 14px; margin: 12px 0; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2a3a50; }
+        .item button { background: linear-gradient(145deg, #ffd700, #ff9800); border: none; padding: 10px 18px; border-radius: 12px; cursor: pointer; font-weight: 800; color: #1a1a1a; transition: transform 0.1s; box-shadow: 0 4px 12px rgba(255,215,0,0.4); }
+        .item button:active { transform: scale(0.95); }
+        .slot-machine { font-size: 60px; text-align: center; margin: 24px 0; letter-spacing: 15px; text-shadow: 0 0 20px rgba(255,215,0,0.6); }
+        .result { text-align: center; font-size: 18px; margin: 16px 0; font-weight: 700; }
+        .mission { display: flex; justify-content: space-between; margin: 14px 0; align-items: center; background: #1e2a3a; padding: 14px; border-radius: 16px; }
+        .mission button { background: linear-gradient(145deg, #ffd700, #ff9800); border: none; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: 800; }
+
+        /* ===== Эффекты ===== */
+        .floating-text { position: absolute; font-size: 32px; font-weight: 900; color: #ffd700; pointer-events: none; animation: floatUp 0.9s forwards; text-shadow: 0 2px 12px rgba(0,0,0,0.9); }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(1.8); } }
+        .particle { position: absolute; width: 10px; height: 10px; background: #ffd700; border-radius: 50%; pointer-events: none; animation: particleFly 0.9s forwards; box-shadow: 0 0 10px #ffd700; }
+        @keyframes particleFly { 0% { opacity: 1; transform: translate(0,0); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)); } }
+        #offline-reward { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(145deg, #4caf50, #2e7d32); padding: 14px 28px; border-radius: 30px; font-size: 15px; font-weight: 800; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+
+        /* ===== Анимации для колеса фортуны ===== */
+        .wheel { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 4px solid #ffd700; position: relative; overflow: hidden; margin: 20px auto; box-shadow: 0 0 30px rgba(255,215,0,0.6); }
+        .wheel-segment { position: absolute; width: 50%; height: 50%; transform-origin: 100% 100%; }
+        .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: #ffd700; border-radius: 50%; z-index: 10; box-shadow: 0 0 15px #ffd700; }
+        .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #ffd700; z-index: 20; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6)); }
     </style>
 </head>
 <body>
@@ -63,17 +177,17 @@
     <!-- Верхняя панель -->
     <div class="top-bar">
         <div class="user-info">
-            <div class="avatar">🐹</div>
+            <div class="avatar" id="avatar">🐹</div>
             <div>
-                <div class="user-name">CEO</div>
-                <div class="user-level">Уровень 1</div>
+                <div class="user-name">CEO (Ты)</div>
+                <div class="user-level">Grandmaster > 9 / 11</div>
             </div>
         </div>
         <div class="profit">💎 <span id="profit">+0</span> / час</div>
         <div class="settings">⚙️</div>
     </div>
 
-    <!-- Карточки -->
+    <!-- Карточки меню -->
     <div class="menu-grid">
         <div class="menu-card" onclick="openWheel()">
             <div class="icon">🎡</div>
@@ -83,7 +197,7 @@
         <div class="menu-card" onclick="openMissions()">
             <div class="icon">📜</div>
             <div class="title">Миссии</div>
-            <div class="timer">0/3</div>
+            <div class="timer">3/5</div>
         </div>
         <div class="menu-card" onclick="openShop()">
             <div class="icon">🛒</div>
@@ -92,15 +206,60 @@
         </div>
     </div>
 
-    <!-- Центр -->
+    <!-- Центральная зона -->
     <div class="main-zone">
         <div class="coin-display">
             <div class="coin-icon">$</div>
             <div id="coinCount">0</div>
         </div>
-        <!-- Хомяк (просто эмодзи, без сложного SVG) -->
-        <div class="hamster-container" id="hamster" onclick="tap(event)">
-            <div class="hamster-emoji">🐹</div>
+
+        <!-- Хомяк SVG (реалистичный) -->
+        <div class="hamster-ring" id="hamsterRing" onclick="tap(event)">
+            <svg class="hamster" viewBox="0 0 200 200">
+                <defs>
+                    <radialGradient id="fur" cx="40%" cy="30%" r="60%">
+                        <stop offset="0%" style="stop-color:#f5c98a"/>
+                        <stop offset="100%" style="stop-color:#c47a3a"/>
+                    </radialGradient>
+                    <linearGradient id="suit" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#2a2a2a"/>
+                        <stop offset="100%" style="stop-color:#111"/>
+                    </linearGradient>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="blur"/>
+                        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+                <!-- Ноги -->
+                <ellipse cx="75" cy="185" rx="22" ry="15" fill="#111"/>
+                <ellipse cx="125" cy="185" rx="22" ry="15" fill="#111"/>
+                <!-- Тело -->
+                <path d="M60,190 C60,140 40,110 50,80 C60,55 100,45 150,55 C180,65 170,105 160,140 C150,180 155,190 155,190" fill="url(#suit)"/>
+                <!-- Рубашка -->
+                <path d="M80,100 L120,100 L100,140" fill="#f0f0f0"/>
+                <!-- Галстук -->
+                <polygon points="90,100 110,100 100,160" fill="#ff9800" filter="url(#glow)"/>
+                <!-- Руки -->
+                <path d="M45,120 Q25,130 30,145" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/>
+                <path d="M155,120 Q175,130 170,145" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/>
+                <!-- Голова -->
+                <ellipse cx="100" cy="65" rx="58" ry="48" fill="url(#fur)"/>
+                <!-- Уши -->
+                <ellipse cx="55" cy="25" rx="20" ry="15" fill="#c47a3a"/>
+                <ellipse cx="145" cy="25" rx="20" ry="15" fill="#c47a3a"/>
+                <ellipse cx="55" cy="25" rx="10" ry="7" fill="#a0522d"/>
+                <ellipse cx="145" cy="25" rx="10" ry="7" fill="#a0522d"/>
+                <!-- Очки -->
+                <rect x="60" y="50" width="80" height="26" rx="13" fill="rgba(0,0,0,0.85)"/>
+                <rect x="55" y="48" width="90" height="4" fill="#111"/>
+                <line x1="65" y1="55" x2="75" y2="70" stroke="#fff" stroke-width="2" opacity="0.4"/>
+                <line x1="130" y1="55" x2="140" y2="70" stroke="#fff" stroke-width="2" opacity="0.4"/>
+                <!-- Рот -->
+                <path d="M85,90 Q100,100 115,90" stroke="#5d4037" stroke-width="3" fill="none"/>
+                <!-- Брови -->
+                <line x1="70" y1="45" x2="85" y2="47" stroke="#5d4037" stroke-width="5"/>
+                <line x1="130" y1="45" x2="115" y2="47" stroke="#5d4037" stroke-width="5"/>
+            </svg>
         </div>
     </div>
 
@@ -114,28 +273,21 @@
         <div class="boost" onclick="activateBoost()">🚀 Boost</div>
     </div>
 
-    <!-- Модалки -->
-    <div class="modal" id="casinoModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('casinoModal')">&times;</span>
-            <h3>🎰 Казино</h3>
-            <p>Ставка: 100 LC</p>
-            <div class="slot-machine" id="slot-machine">🍒 💎 7️⃣</div>
-            <div class="result" id="casino-result"></div>
-            <button onclick="spinSlot()" style="background:#ffd700;border:none;padding:10px;border-radius:10px;width:100%;cursor:pointer;">Крутить</button>
-        </div>
-    </div>
-
+    <!-- Модалка Колесо -->
     <div class="modal" id="wheelModal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('wheelModal')">&times;</span>
             <h3>🎡 Колесо Фортуны</h3>
-            <p>Каждые 24 часа бесплатно</p>
+            <div class="wheel" id="wheelContainer">
+                <div class="wheel-pointer"></div>
+                <div class="wheel-center"></div>
+            </div>
             <div class="result" id="wheel-result"></div>
-            <button onclick="spinWheel()" style="background:#ffd700;border:none;padding:10px;border-radius:10px;width:100%;cursor:pointer;">Крутить</button>
+            <button class="boost" onclick="spinWheel()" style="width:100%; margin-top:10px;">Крутить</button>
         </div>
     </div>
 
+    <!-- Модалка Магазин -->
     <div class="modal" id="shopModal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('shopModal')">&times;</span>
@@ -144,11 +296,24 @@
         </div>
     </div>
 
+    <!-- Модалка Миссии -->
     <div class="modal" id="missionsModal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('missionsModal')">&times;</span>
-            <h3>📜 Миссии</h3>
+            <h3>📜 Ежедневные миссии</h3>
             <div id="missions-list"></div>
+        </div>
+    </div>
+
+    <!-- Модалка Казино -->
+    <div class="modal" id="casinoModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('casinoModal')">&times;</span>
+            <h3>🎰 Казино</h3>
+            <p>Ставка: 100 LC</p>
+            <div class="slot-machine" id="slot-machine">🍒 💎 7️⃣</div>
+            <div class="result" id="casino-result"></div>
+            <button class="boost" onclick="spinSlot()" style="width:100%; margin-top:10px;">Крутить</button>
         </div>
     </div>
 
@@ -214,7 +379,7 @@
             if (state.skins.hat) outfit += '🎩';
             if (state.skins.glasses) outfit += '🕶️';
             if (state.skins.chain) outfit += '⛓️';
-            document.querySelector('.avatar').innerText = outfit + '🐹';
+            document.getElementById('avatar').innerText = outfit + '🐹';
         }
 
         // ======== ТАП ========
@@ -222,33 +387,41 @@
             if (state.energy <= 0) { alert('Энергия закончилась!'); return; }
             state.energy -= 1;
             let gain = state.tapValue * state.multiplier * state.passiveMultiplier;
-            if (Math.random() < state.critChance) { gain *= 10; }
+            if (Math.random() < state.critChance) { gain *= 10; playSound('crit'); if (navigator.vibrate) navigator.vibrate(100); }
+            else { playSound('tap'); if (navigator.vibrate) navigator.vibrate(30); }
             state.LC += gain;
             state.missions.taps++;
-            
-            // Эффект (просто меняем размер)
-            const hamster = document.getElementById('hamster');
-            hamster.style.transform = 'scale(0.92)';
-            setTimeout(() => hamster.style.transform = 'scale(1)', 100);
-            
-            // Всплывающая цифра
-            const rect = hamster.getBoundingClientRect();
-            const x = e.clientX - rect.left - 20;
-            const y = e.clientY - rect.top - 30;
+
+            // Эффекты
+            const ring = document.getElementById('hamsterRing');
+            ring.style.transform = 'scale(1.08)';
+            setTimeout(() => ring.style.transform = 'scale(1)', 150);
+
+            const rect = ring.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Летящий текст
             const floating = document.createElement('div');
-            floating.style.position = 'absolute';
-            floating.style.left = x + 'px';
-            floating.style.top = y + 'px';
-            floating.style.fontSize = '24px';
-            floating.style.fontWeight = 'bold';
-            floating.style.color = '#ffd700';
-            floating.style.pointerEvents = 'none';
-            floating.style.transition = 'opacity 0.5s, transform 0.5s';
-            floating.innerText = '+' + gain;
-            hamster.appendChild(floating);
-            setTimeout(() => { floating.style.opacity = '0'; floating.style.transform = 'translateY(-50px)'; }, 50);
-            setTimeout(() => floating.remove(), 600);
-            
+            floating.className = 'floating-text';
+            floating.innerText = '+' + Math.floor(gain);
+            floating.style.left = (x - 20) + 'px';
+            floating.style.top = (y - 40) + 'px';
+            ring.appendChild(floating);
+            setTimeout(() => floating.remove(), 900);
+
+            // Частицы
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.setProperty('--dx', (Math.random() * 100 - 50) + 'px');
+                particle.style.setProperty('--dy', (Math.random() * -80 - 20) + 'px');
+                ring.appendChild(particle);
+                setTimeout(() => particle.remove(), 900);
+            }
+
             updateUI();
             saveGame();
         }
@@ -270,7 +443,7 @@
             const resultDiv = document.getElementById('casino-result');
             if (reels[0] === '🐹' && reels[1] === '🐹' && reels[2] === '🐹') {
                 state.LC += state.jackpot; state.QC += 10;
-                resultDiv.innerHTML = `<span style="color:#ffd700;">ДЖЕКПОТ! +${state.jackpot} LC</span>`;
+                resultDiv.innerHTML = `<span style="color:#ffd700;">ДЖЕКПОТ! +${state.jackpot} LC и +10 QC</span>`;
                 state.jackpot = 1000; state.missions.casinoWins++; playSound('win');
             } else if (reels[0] === reels[1] && reels[1] === reels[2]) {
                 const win = 100 * 10; state.LC += win;
@@ -287,18 +460,82 @@
         }
 
         // ======== КОЛЕСО ========
-        function openWheel() { document.getElementById('wheelModal').style.display = 'flex'; document.getElementById('wheel-result').textContent = ''; }
+        function openWheel() { document.getElementById('wheelModal').style.display = 'flex'; document.getElementById('wheel-result').textContent = ''; generateWheel(); }
+
+        function generateWheel() {
+            const container = document.getElementById('wheelContainer');
+            container.innerHTML = '';
+            const segments = ['+100 LC', '+500 LC', '+5 QC', 'x2', '+1000 LC', '+2 QC', 'x3', '+2000 LC'];
+            const colors = ['#ffd700', '#ff9800', '#4caf50', '#2196f3', '#9c27b0', '#f44336', '#00bcd4', '#ff5722'];
+            const segmentAngle = 360 / segments.length;
+            for (let i = 0; i < segments.length; i++) {
+                const seg = document.createElement('div');
+                seg.className = 'wheel-segment';
+                seg.style.transform = `rotate(${i * segmentAngle}deg)`;
+                seg.style.background = `conic-gradient(from ${i * segmentAngle}deg, ${colors[i]}, ${colors[i]})`;
+                seg.style.clipPath = 'polygon(0 0, 100% 0, 50% 100%)';
+                seg.style.width = '100%';
+                seg.style.height = '100%';
+                const label = document.createElement('span');
+                label.style.position = 'absolute';
+                label.style.top = '10%';
+                label.style.left = '50%';
+                label.style.transform = 'translateX(-50%)';
+                label.style.fontSize = '12px';
+                label.style.fontWeight = 'bold';
+                label.style.color = '#fff';
+                label.style.textShadow = '1px 1px 2px #000';
+                label.innerText = segments[i];
+                seg.appendChild(label);
+                container.appendChild(seg);
+            }
+            const pointer = document.createElement('div');
+            pointer.className = 'wheel-pointer';
+            container.appendChild(pointer);
+            const center = document.createElement('div');
+            center.className = 'wheel-center';
+            container.appendChild(center);
+        }
 
         function spinWheel() {
             const now = Date.now();
             if (now - state.dailyWheel < 24 * 3600 * 1000) { alert('Колесо будет доступно через ' + Math.ceil((24*3600*1000 - (now - state.dailyWheel))/3600000) + ' ч'); return; }
             state.dailyWheel = now;
-            const prizes = [{ type: 'LC', amount: 1000 }, { type: 'LC', amount: 5000 }, { type: 'QC', amount: 5 }, { type: 'MULT', amount: 2 }];
-            const prize = prizes[Math.floor(Math.random() * prizes.length)];
-            if (prize.type === 'LC') { state.LC += prize.amount; document.getElementById('wheel-result').innerHTML = `🎉 +${prize.amount} LC`; }
-            else if (prize.type === 'QC') { state.QC += prize.amount; document.getElementById('wheel-result').innerHTML = `🎉 +${prize.amount} QC`; }
-            else { state.multiplierTimer = 600; state.multiplier = prize.amount; document.getElementById('wheel-result').innerHTML = `🎉 Множитель x${prize.amount} на 10 минут!`; }
-            updateUI(); saveGame();
+            const container = document.getElementById('wheelContainer');
+            const segments = ['+100 LC', '+500 LC', '+5 QC', 'x2', '+1000 LC', '+2 QC', 'x3', '+2000 LC'];
+            const prizes = [
+                { type: 'LC', amount: 100 },
+                { type: 'LC', amount: 500 },
+                { type: 'QC', amount: 5 },
+                { type: 'MULT', amount: 2 },
+                { type: 'LC', amount: 1000 },
+                { type: 'QC', amount: 2 },
+                { type: 'MULT', amount: 3 },
+                { type: 'LC', amount: 2000 }
+            ];
+            const randomIndex = Math.floor(Math.random() * segments.length);
+            const angle = 360 * 5 + (360 - (randomIndex * (360 / segments.length)) + (360 / segments.length / 2));
+            container.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
+            container.style.transform = `rotate(${angle}deg)`;
+            setTimeout(() => {
+                const prize = prizes[randomIndex];
+                if (prize.type === 'LC') {
+                    state.LC += prize.amount;
+                    document.getElementById('wheel-result').innerHTML = `🎉 Выигрыш: +${prize.amount} LC`;
+                } else if (prize.type === 'QC') {
+                    state.QC += prize.amount;
+                    document.getElementById('wheel-result').innerHTML = `🎉 Выигрыш: +${prize.amount} QC`;
+                } else {
+                    state.multiplierTimer = 600;
+                    state.multiplier = prize.amount;
+                    document.getElementById('wheel-result').innerHTML = `🎉 Множитель x${prize.amount} на 10 минут!`;
+                }
+                container.style.transition = 'none';
+                container.style.transform = `rotate(0deg)`;
+                updateUI();
+                saveGame();
+                playSound('win');
+            }, 4000);
         }
 
         // ======== МАГАЗИН ========
@@ -365,17 +602,18 @@
         }
 
         // ======== ЗАКРЫТИЕ ========
-          function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // ======== ЗВУКИ (упрощённые) ========
+        // ======== ЗВУКИ ========
         function playSound(type) {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator(); const gain = ctx.createGain();
                 osc.connect(gain); gain.connect(ctx.destination);
-                if (type === 'win') { osc.frequency.value = 600; gain.gain.setValueAtTime(0.1, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); osc.start(); osc.stop(ctx.currentTime + 0.3); }
-                else if (type === 'lose') { osc.frequency.value = 200; gain.gain.setValueAtTime(0.1, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2); osc.start(); osc.stop(ctx.currentTime + 0.2); }
-                else { osc.frequency.value = 500; gain.gain.setValueAtTime(0.05, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1); osc.start(); osc.stop(ctx.currentTime + 0.1); }
+                if (type === 'win') { osc.frequency.value = 700; gain.gain.setValueAtTime(0.2, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5); osc.start(); osc.stop(ctx.currentTime + 0.5); }
+                else if (type === 'lose') { osc.frequency.value = 200; gain.gain.setValueAtTime(0.2, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); osc.start(); osc.stop(ctx.currentTime + 0.3); }
+                else if (type === 'crit') { osc.frequency.value = 1200; gain.gain.setValueAtTime(0.3, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4); osc.start(); osc.stop(ctx.currentTime + 0.4); }
+                else { osc.frequency.value = 800; gain.gain.setValueAtTime(0.1, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1); osc.start(); osc.stop(ctx.currentTime + 0.1); }
             } catch(e) {}
         }
 
