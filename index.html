@@ -8,59 +8,56 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Segoe UI', Roboto, sans-serif; background: #0b0f14; color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* Убираем тяжелые эффекты для плавности */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #131720; border-bottom: 1px solid #222; }
+        /* Верхняя панель */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #131720; border-bottom: 2px solid #ffd700; }
         .user-info { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 46px; height: 46px; border-radius: 50%; background: #333; border: 2px solid #4caf50; display: flex; align-items: center; justify-content: center; font-size: 26px; }
-        .user-name { font-weight: 800; font-size: 14px; }
-        .user-level { font-size: 11px; color: #888; }
+        .avatar { width: 48px; height: 48px; border-radius: 50%; background: #333; border: 2px solid #ffd700; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .user-name { font-weight: 800; font-size: 15px; }
+        .user-level { font-size: 11px; color: #aaa; }
         .profit { background: #222; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; color: #ffd700; }
-        .settings { font-size: 24px; color: #aaa; cursor: pointer; }
+        .settings { font-size: 26px; cursor: pointer; color: #aaa; }
 
-        /* Меню: 2 колонки для удобства на телефоне */
+        /* Меню - 2 колонки */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; }
-        .menu-card { background: #1a1f28; border: 1px solid #333; border-radius: 16px; padding: 14px; text-align: center; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .menu-card { background: #1a1f28; border: 1px solid #2a2f3a; border-radius: 14px; padding: 14px; text-align: center; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
         .menu-card:active { transform: scale(0.96); }
         .menu-card .icon { font-size: 32px; margin-bottom: 6px; }
-        .menu-card .title { font-size: 12px; font-weight: 700; color: #ccc; }
-        .menu-card .timer { font-size: 11px; color: #777; }
+        .menu-card .title { font-size: 13px; font-weight: 700; color: #ccc; }
 
+        /* Центр */
         .main-zone { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .coin-display { display: flex; align-items: center; gap: 10px; font-size: 40px; font-weight: 900; color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.5); margin-bottom: 15px; }
-        .coin-icon { width: 48px; height: 48px; border-radius: 50%; background: radial-gradient(circle, #ffe082, #ffb300); display: flex; align-items: center; justify-content: center; font-size: 24px; color: #111; }
-
-        /* Хомяк: убираем вращающееся кольцо, оставляем светящийся контур */
-        .hamster-ring { width: 280px; height: 280px; border-radius: 50%; background: #12151c; padding: 8px; border: 4px solid #2196f3; box-shadow: 0 0 20px rgba(33,150,243,0.4); position: relative; cursor: pointer; }
+        .coin-display { display: flex; align-items: center; gap: 10px; font-size: 42px; font-weight: 900; color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.5); margin-bottom: 15px; }
+        .coin-icon { width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle, #ffe082, #ffb300); display: flex; align-items: center; justify-content: center; font-size: 26px; color: #111; }
+        .hamster-ring { width: 280px; height: 280px; border-radius: 50%; background: #12151c; border: 4px solid #2196f3; box-shadow: 0 0 20px rgba(33,150,243,0.4); position: relative; cursor: pointer; }
         .hamster-ring:active { transform: scale(0.97); }
         .hamster { width: 260px; height: 260px; }
-        
-        .bottom-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #131720; border-top: 1px solid #222; }
+
+        /* Нижняя панель */
+        .bottom-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #131720; border-top: 2px solid #ffd700; }
         .energy { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #ffd700; }
         .energy-bar { width: 130px; height: 10px; background: #333; border-radius: 6px; overflow: hidden; }
         .energy-fill { height: 100%; background: #ffd700; }
         .boost { background: #2196f3; padding: 10px 20px; border-radius: 20px; font-weight: 800; color: #fff; cursor: pointer; }
 
         /* Модалки */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 999; }
-        .modal-content { background: #1a1f28; padding: 20px; border-radius: 20px; width: 92%; max-width: 400px; border: 2px solid #333; max-height: 90vh; overflow-y: auto; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 999; }
+        .modal-content { background: #1a1f28; padding: 20px; border-radius: 20px; width: 92%; max-width: 400px; border: 2px solid #333; max-height: 90vh; overflow-y: auto; position: relative; }
         .modal-content h3 { margin-bottom: 15px; color: #ffd700; }
-        .close { float: right; font-size: 26px; cursor: pointer; color: #fff; }
+        .close { position: absolute; top: 10px; right: 15px; font-size: 30px; cursor: pointer; color: #fff; z-index: 10; }
+        .close:hover { color: #ffd700; }
         .item { background: #222; padding: 12px; margin: 8px 0; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
         .item button { background: #ffd700; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; color: #111; }
         .slot-machine { font-size: 50px; text-align: center; margin: 20px 0; letter-spacing: 10px; }
         .result { text-align: center; font-size: 16px; margin: 10px 0; font-weight: bold; }
         .mission { display: flex; justify-content: space-between; background: #222; padding: 10px; margin: 8px 0; border-radius: 10px; align-items: center; }
         .mission button { background: #ffd700; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; }
-
+        .achievement { background: #222; padding: 10px; margin: 8px 0; border-radius: 8px; display: flex; justify-content: space-between; }
         .floating-text { position: absolute; font-size: 24px; font-weight: 900; color: #ffd700; animation: floatUp 0.8s forwards; pointer-events: none; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
-        
         #offline-reward { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #4caf50; padding: 10px 20px; border-radius: 20px; z-index: 999; font-weight: bold; }
-
-        /* Колесо фортуны (SVG) */
-        .wheel-container { position: relative; width: 300px; height: 300px; margin: 20px auto; }
+        .wheel-container { position: relative; width: 280px; height: 280px; margin: 20px auto; }
         #wheelSvg { width: 100%; height: 100%; }
-        .pointer { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #ffd700; z-index: 10; }
+        .pointer { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #ffd700; z-index: 10; }
     </style>
 </head>
 <body>
@@ -72,31 +69,27 @@
             <div class="avatar" id="avatar">🐹</div>
             <div>
                 <div class="user-name">CEO</div>
-                <div class="user-level">Level 1</div>
+                <div class="user-level" id="hamsterLevel">Level 1</div>
             </div>
         </div>
         <div class="profit">💎 <span id="profit">+0</span>/ч</div>
         <div class="settings" onclick="openSettings()">⚙️</div>
     </div>
 
-    <!-- Меню (Добавлено Казино!) -->
+    <!-- Меню -->
     <div class="menu-grid">
-        <div class="menu-card" onclick="openWheel()">
-            <div class="icon">🎡</div>
-            <div class="title">Колесо</div>
-        </div>
-        <div class="menu-card" onclick="openCasino()">
-            <div class="icon">🎰</div>
-            <div class="title">Казино</div>
-        </div>
-        <div class="menu-card" onclick="openMissions()">
-            <div class="icon">📜</div>
-            <div class="title">Миссии</div>
-        </div>
-        <div class="menu-card" onclick="openShop()">
-            <div class="icon">🛒</div>
-            <div class="title">Магазин</div>
-        </div>
+        <div class="menu-card" onclick="openWheel()"><div class="icon">🎡</div><div class="title">Колесо</div></div>
+        <div class="menu-card" onclick="openCasino()"><div class="icon">🎰</div><div class="title">Казино</div></div>
+        <div class="menu-card" onclick="openMissions()"><div class="icon">📜</div><div class="title">Миссии</div></div>
+        <div class="menu-card" onclick="openShop()"><div class="icon">🛒</div><div class="title">Магазин</div></div>
+        <div class="menu-card" onclick="openAchievements()"><div class="icon">🏆</div><div class="title">Достижения</div></div>
+        <div class="menu-card" onclick="openDaily()"><div class="icon">🎁</div><div class="title">Награда</div></div>
+        <div class="menu-card" onclick="openBoss()"><div class="icon">👹</div><div class="title">Босс</div></div>
+        <div class="menu-card" onclick="openMiniGames()"><div class="icon">🎲</div><div class="title">Мини-игры</div></div>
+        <div class="menu-card" onclick="openCards()"><div class="icon">🃏</div><div class="title">Карты</div></div>
+        <div class="menu-card" onclick="openAuction()"><div class="icon">🔨</div><div class="title">Аукцион</div></div>
+        <div class="menu-card" onclick="openCipher()"><div class="icon">🔢</div><div class="title">Шифр</div></div>
+        <div class="menu-card" onclick="openLeaderboard()"><div class="icon">📊</div><div class="title">Лидеры</div></div>
     </div>
 
     <!-- Центр -->
@@ -105,29 +98,24 @@
             <div class="coin-icon">$</div>
             <div id="coinCount">0</div>
         </div>
-
         <div class="hamster-ring" id="hamster" onclick="tap(event)">
-            <svg class="hamster" viewBox="0 0 200 200">
+            <svg class="hamster" viewBox="0 0 200 200" id="hamsterSvg">
                 <defs>
                     <radialGradient id="fur" cx="40%" cy="30%" r="60%">
                         <stop offset="0%" style="stop-color:#f5d0a9"/>
                         <stop offset="100%" style="stop-color:#c47a3a"/>
                     </radialGradient>
-                    <linearGradient id="suit" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style="stop-color:#333"/>
-                        <stop offset="100%" style="stop-color:#111"/>
-                    </linearGradient>
                 </defs>
                 <!-- Ноги -->
                 <ellipse cx="75" cy="185" rx="20" ry="12" fill="#111"/>
                 <ellipse cx="125" cy="185" rx="20" ry="12" fill="#111"/>
                 <!-- Тело (Пиджак) -->
-                <path d="M60,190 C60,140 40,110 50,80 C60,55 100,45 150,55 C180,65 170,105 160,140 C150,180 155,190 155,190" fill="url(#suit)"/>
-                <!-- Белая рубашка -->
+                <path d="M60,190 C60,140 40,110 50,80 C60,55 100,45 150,55 C180,65 170,105 160,140 C150,180 155,190 155,190" fill="#1a1a1a"/>
+                <!-- Рубашка -->
                 <path d="M80,100 L120,100 L100,140" fill="#f0f0f0"/>
                 <!-- Галстук -->
                 <polygon points="90,100 110,100 100,160" fill="#ff9800"/>
-                <!-- Руки в карманах -->
+                <!-- Руки -->
                 <path d="M45,130 Q30,140 35,150" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/>
                 <path d="M155,130 Q170,140 165,150" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/>
                 <!-- Голова -->
@@ -137,11 +125,11 @@
                 <ellipse cx="145" cy="25" rx="20" ry="15" fill="#c47a3a"/>
                 <ellipse cx="55" cy="25" rx="10" ry="7" fill="#a0522d"/>
                 <ellipse cx="145" cy="25" rx="10" ry="7" fill="#a0522d"/>
-                <!-- Очки (Блики, чтобы выглядели круто) -->
+                <!-- Очки -->
                 <rect x="60" y="50" width="80" height="24" rx="12" fill="#111"/>
                 <line x1="65" y1="55" x2="75" y2="65" stroke="#fff" stroke-width="3" opacity="0.6"/>
                 <line x1="130" y1="55" x2="140" y2="65" stroke="#fff" stroke-width="3" opacity="0.6"/>
-                <!-- Рот/Улыбка -->
+                <!-- Рот -->
                 <path d="M85,90 Q100,100 115,90" stroke="#5d4037" stroke-width="4" fill="none"/>
                 <!-- Брови -->
                 <line x1="70" y1="45" x2="85" y2="47" stroke="#5d4037" stroke-width="4"/>
@@ -160,7 +148,7 @@
         <div class="boost" onclick="activateBoost()">🚀 Boost</div>
     </div>
 
-    <!-- Модалка: Колесо -->
+    <!-- Модалки (все) -->
     <div class="modal" id="wheelModal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('wheelModal')">&times;</span>
@@ -174,7 +162,6 @@
         </div>
     </div>
 
-    <!-- Модалка: Казино -->
     <div class="modal" id="casinoModal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('casinoModal')">&times;</span>
@@ -186,7 +173,6 @@
         </div>
     </div>
 
-    <!-- Модалка: Магазин -->
     <div class="modal" id="shopModal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('shopModal')">&times;</span>
@@ -195,7 +181,6 @@
         </div>
     </div>
 
-    <!-- Модалка: Миссии -->
     <div class="modal" id="missionsModal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('missionsModal')">&times;</span>
@@ -204,7 +189,6 @@
         </div>
     </div>
 
-    <!-- Модалка: Настройки -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('settingsModal')">&times;</span>
@@ -212,318 +196,82 @@
             <div class="item">Звук <button id="soundBtn" onclick="toggleSound()">Вкл</button></div>
             <div class="item">Вибрация <button id="vibroBtn" onclick="toggleVibration()">Вкл</button></div>
             <div class="item">Престиж (сброс) <button onclick="doPrestige()">Сброс</button></div>
+            <div class="item">Реферальная ссылка <button onclick="copyReferral()">Копировать</button></div>
         </div>
     </div>
 
-    <!-- Модалка: Комбо -->
-    <div class="modal" id="comboModal">
+    <div class="modal" id="achievementsModal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('comboModal')">&times;</span>
-            <h3>🧩 Ежедневный Комбо</h3>
-            <p>Введи 4 цифры для получения <b>1,000,000 LC</b></p>
-            <input type="number" id="comboInput" style="width:100%; padding:10px; margin:10px 0; font-size:20px;">
-            <button onclick="checkCombo()">Проверить</button>
+            <span class="close" onclick="closeModal('achievementsModal')">&times;</span>
+            <h3>🏆 Достижения</h3>
+            <div id="achievements-list"></div>
         </div>
     </div>
 
-    <script>
-        // ======== СОСТОЯНИЕ ========
-        let state = {
-            LC: 1000, QC: 0,
-            energy: 100, maxEnergy: 100,
-            tapValue: 15, profitPerHour: 0,
-            critChance: 0.1, multiplier: 1, multiplierTimer: 0,
-            robots: 0, farmLevel: 0,
-            skins: { hat: false, glasses: false, chain: false },
-            missions: { taps: 0, casinoWins: 0 },
-            dailyWheel: 0, lastVisit: Date.now(),
-            jackpot: 1000, passiveMultiplier: 1,
-            soundOn: true, vibroOn: true,
-            prestige: 0,
-            lastAirdrop: 0, // 30 минут
-            comboDone: false
-        };
+    <div class="modal" id="dailyModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('dailyModal')">&times;</span>
+            <h3>🎁 Ежедневная награда</h3>
+            <div id="daily-reward"></div>
+            <button class="boost" onclick="claimDaily()" style="width:100%; margin-top:10px;">Получить</button>
+        </div>
+    </div>
 
-        function saveGame() { localStorage.setItem('neonHamster', JSON.stringify(state)); }
+    <div class="modal" id="bossModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('bossModal')">&times;</span>
+            <h3>👹 Босс дня</h3>
+            <div id="boss-info"></div>
+            <button class="boost" onclick="attackBoss()" style="width:100%; margin-top:10px;">Атаковать</button>
+        </div>
+    </div>
 
-        function loadGame() {
-            const saved = localStorage.getItem('neonHamster');
-            if (saved) { Object.assign(state, JSON.parse(saved)); }
-            const now = Date.now();
-            const elapsed = Math.min(2 * 3600 * 1000, now - state.lastVisit);
-            const offlineIncome = (state.robots * 20 + state.farmLevel * 50) * (elapsed / 3600000);
-            if (offlineIncome > 0) { state.LC += offlineIncome; showOfflineReward(offlineIncome); }
-            state.lastVisit = now;
-            calculateProfitPerHour();
-            // Аирдроп
-            if (now - state.lastAirdrop > 1800000) { // 30 мин
-                alert('Аирдроп доступен! +10,000 LC');
-                state.LC += 10000;
-                state.lastAirdrop = now;
-                saveGame();
-            }
-        }
+    <div class="modal" id="miniGamesModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('miniGamesModal')">&times;</span>
+            <h3>🎲 Мини-игры</h3>
+            <button onclick="playCoinFlip()" style="width:100%; margin-bottom:10px;">Орёл/Решка (ставка 50 LC)</button>
+            <button onclick="playGuessNumber()" style="width:100%; margin-bottom:10px;">Угадай число (ставка 20 LC)</button>
+            <div id="mini-result"></div>
+        </div>
+    </div>
 
-        function showOfflineReward(amount) {
-            const el = document.getElementById('offline-reward');
-            el.textContent = `Оффлайн: +${Math.floor(amount)} LC`;
-            el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 5000);
-        }
+    <div class="modal" id="cardsModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('cardsModal')">&times;</span>
+            <h3>🃏 Коллекция карт</h3>
+            <div id="cards-collection"></div>
+            <button class="boost" onclick="drawCard()" style="width:100%; margin-top:10px;">Открыть карту (500 LC)</button>
+        </div>
+    </div>
 
-        function calculateProfitPerHour() {
-            state.profitPerHour = (state.robots * 100 + state.farmLevel * 250) * (1 + state.prestige * 0.1);
-            document.getElementById('profit').innerText = '+' + Math.floor(state.profitPerHour).toLocaleString('ru-RU');
-        }
+    <div class="modal" id="auctionModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('auctionModal')">&times;</span>
+            <h3>🔨 Аукцион скинов</h3>
+            <div id="auction-items"></div>
+        </div>
+    </div>
 
-        function updateUI() {
-            document.getElementById('coinCount').innerText = Math.floor(state.LC).toLocaleString('ru-RU');
-            document.getElementById('energyCount').innerText = `${Math.floor(state.energy)} / ${state.maxEnergy}`;
-            document.getElementById('energyFill').style.width = (state.energy / state.maxEnergy * 100) + '%';
-            calculateProfitPerHour();
-            updateAvatar();
-        }
+    <div class="modal" id="cipherModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('cipherModal')">&times;</span>
+            <h3>🔢 Ежедневный шифр</h3>
+            <p>Введи 4-значный код для награды</p>
+            <input type="number" id="cipherInput" style="width:100%; padding:10px; margin:10px 0;">
+            <button onclick="checkCipher()" style="width:100%;">Проверить</button>
+            <div id="cipher-result"></div>
+        </div>
+    </div>
 
-        function updateAvatar() {
-            let outfit = '';
-            if (state.skins.hat) outfit += '🎩';
-            if (state.skins.glasses) outfit += '🕶️';
-            if (state.skins.chain) outfit += '⛓️';
-            document.getElementById('avatar').innerText = outfit + '🐹';
-        }
+    <div class="modal" id="leaderboardModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('leaderboardModal')">&times;</span>
+            <h3>📊 Локальный лидерборд</h3>
+            <div id="leaderboard-list"></div>
+        </div>
+    </div>
 
-        // ======== ТАП ========
-        function tap(e) {
-            if (state.energy <= 0) return;
-            state.energy -= 1;
-            let gain = state.tapValue * state.multiplier * state.passiveMultiplier * (1 + state.prestige * 0.1);
-            if (Math.random() < state.critChance) { gain *= 10; playSound('crit'); if(state.vibroOn) navigator.vibrate(100); }
-            else { playSound('tap'); if(state.vibroOn) navigator.vibrate(30); }
-            state.LC += gain;
-            state.missions.taps++;
-
-            const ring = document.getElementById('hamster');
-            ring.style.transform = 'scale(1.08)';
-            setTimeout(() => ring.style.transform = 'scale(1)', 150);
-
-            const rect = ring.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            const floating = document.createElement('div');
-            floating.className = 'floating-text';
-            floating.innerText = '+' + Math.floor(gain);
-            floating.style.left = (x - 20) + 'px';
-            floating.style.top = (y - 40) + 'px';
-            ring.appendChild(floating);
-            setTimeout(() => floating.remove(), 800);
-
-            updateUI(); saveGame();
-        }
-
-        // ======== КАЗИНО ========
-        function openCasino() { document.getElementById('casinoModal').style.display = 'flex'; document.getElementById('casino-result').textContent = ''; }
-
-        function spinSlot() {
-            if (state.LC < 100) { alert('Мало денег!'); return; }
-            state.LC -= 100;
-            state.jackpot += 10;
-            const symbols = ['🍒', '💎', '7️⃣', '🐹'];
-            const reels = [symbols[Math.floor(Math.random()*4)], symbols[Math.floor(Math.random()*4)], symbols[Math.floor(Math.random()*4)]];
-            document.getElementById('slot-machine').textContent = reels.join(' ');
-            const res = document.getElementById('casino-result');
-            if (reels[0] === '🐹' && reels[1] === '🐹' && reels[2] === '🐹') {
-                state.LC += state.jackpot; state.QC += 10;
-                res.innerHTML = `<span style="color:#ffd700;">ДЖЕКПОТ! +${state.jackpot} LC</span>`;
-                state.jackpot = 1000; state.missions.casinoWins++; playSound('win');
-            } else if (reels[0] === reels[1] && reels[1] === reels[2]) {
-                state.LC += 1000; res.innerHTML = '<span style="color:#4caf50;">Выигрыш 1000 LC</span>';
-                state.missions.casinoWins++; playSound('win');
-            } else if (reels[0] === reels[1] || reels[1] === reels[2] || reels[0] === reels[2]) {
-                state.LC += 200; res.innerHTML = '<span style="color:#4caf50;">Выигрыш 200 LC</span>';
-                state.missions.casinoWins++; playSound('win');
-            } else {
-                res.innerHTML = '<span style="color:#f44336;">Проигрыш</span>'; playSound('lose');
-            }
-            updateUI(); saveGame();
-        }
-
-        // ======== КОЛЕСО (Переделанное на SVG) ========
-        function openWheel() {
-            document.getElementById('wheelModal').style.display = 'flex';
-            drawWheel();
-        }
-
-        function drawWheel() {
-            const svg = document.getElementById('wheelSvg');
-            let html = '';
-            const segments = [
-                { text: '+100', color: '#ffd700' }, { text: '+500', color: '#ff9800' },
-                { text: '+5 QC', color: '#4caf50' }, { text: 'x2', color: '#2196f3' },
-                { text: '+1000', color: '#9c27b0' }, { text: '+2 QC', color: '#00bcd4' },
-                { text: 'x3', color: '#f44336' }, { text: '+2000', color: '#ff5722' }
-            ];
-            const angle = 360 / segments.length;
-            for (let i = 0; i < segments.length; i++) {
-                let start = (i * angle) - 90;
-                let end = start + angle;
-                let x1 = 100 + 100 * Math.cos(start * Math.PI / 180);
-                let y1 = 100 + 100 * Math.sin(start * Math.PI / 180);
-                let x2 = 100 + 100 * Math.cos(end * Math.PI / 180);
-                let y2 = 100 + 100 * Math.sin(end * Math.PI / 180);
-                html += `<path d="M100,100 L${x1},${y1} A100,100 0 0,1 ${x2},${y2} Z" fill="${segments[i].color}" stroke="#000" stroke-width="2"/>`;
-                html += `<text x="100" y="100" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle" transform="rotate(${start + angle/2}, 100, 100) translate(0, -60)">${segments[i].text}</text>`;
-            }
-            svg.innerHTML = html;
-            svg.style.transform = 'rotate(0deg)';
-        }
-
-        function spinWheel() {
-            const now = Date.now();
-            if (now - state.dailyWheel < 24 * 3600 * 1000) {
-                alert('Колесо будет доступно через ' + Math.ceil((24*3600*1000 - (now - state.dailyWheel))/3600000) + ' ч');
-                return;
-            }
-            state.dailyWheel = now;
-            const svg = document.getElementById('wheelSvg');
-            const result = document.getElementById('wheel-result');
-            // Выбираем случайный сегмент
-            const randomIndex = Math.floor(Math.random() * 8);
-            const angleToStop = 360 * 5 + (360 - (randomIndex * 45)); // 5 оборотов
-            svg.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
-            svg.style.transform = `rotate(${angleToStop}deg)`;
-            
-            setTimeout(() => {
-                const prizes = [
-                    { type: 'LC', amount: 100 }, { type: 'LC', amount: 500 },
-                    { type: 'QC', amount: 5 }, { type: 'MULT', amount: 2 },
-                    { type: 'LC', amount: 1000 }, { type: 'QC', amount: 2 },
-                    { type: 'MULT', amount: 3 }, { type: 'LC', amount: 2000 }
-                ];
-                const prize = prizes[randomIndex];
-                if (prize.type === 'LC') { state.LC += prize.amount; result.innerHTML = `🎉 +${prize.amount} LC`; }
-                else if (prize.type === 'QC') { state.QC += prize.amount; result.innerHTML = `🎉 +${prize.amount} QC`; }
-                else { state.multiplierTimer = 600; state.multiplier = prize.amount; result.innerHTML = `🎉 Множитель x${prize.amount} на 10 минут!`; }
-                updateUI(); saveGame(); playSound('win');
-            }, 4000);
-        }
-
-        // ======== МАГАЗИН ========
-        function openShop() { document.getElementById('shopModal').style.display = 'flex'; renderShop(); }
-
-        function renderShop() {
-            const c = document.getElementById('shop-items');
-            let html = '';
-            if (!state.skins.hat) html += `<div class="item">Шляпа (1000 LC) <button onclick="buySkin('hat')">Купить</button></div>`;
-            if (!state.skins.glasses) html += `<div class="item">Очки (2000 LC) <button onclick="buySkin('glasses')">Купить</button></div>`;
-            if (!state.skins.chain) html += `<div class="item">Цепь (5000 LC) <button onclick="buySkin('chain')">Купить</button></div>`;
-            if (state.robots < 3) { const costs = [1000, 5000, 20000]; html += `<div class="item">Робот ур.${state.robots+1} (${costs[state.robots]} LC) <button onclick="buyRobot()">Купить</button></div>`; }
-            if (state.farmLevel < 5) { const cost = 2000 * (state.farmLevel + 1); html += `<div class="item">Ферма ур.${state.farmLevel+1} (${cost} LC) <button onclick="buyFarm()">Купить</button></div>`; }
-            c.innerHTML = html;
-        }
-
-        function buySkin(type) {
-            const prices = { hat: 1000, glasses: 2000, chain: 5000 };
-            if (state.LC < prices[type]) { alert('Не хватает LC'); return; }
-            state.LC -= prices[type]; state.skins[type] = true;
-            if (type === 'hat') state.maxEnergy += 50;
-            if (type === 'glasses') state.critChance = 0.25;
-            if (type === 'chain') state.robots += 1;
-            updateUI(); saveGame(); renderShop();
-        }
-
-        function buyRobot() { const costs = [1000, 5000, 20000]; if (state.robots >= 3) return; const cost = costs[state.robots]; if (state.LC < cost) { alert('Не хватает'); return; } state.LC -= cost; state.robots++; updateUI(); saveGame(); renderShop(); }
-        function buyFarm() { if (state.farmLevel >= 5) return; const cost = 2000 * (state.farmLevel + 1); if (state.LC < cost) { alert('Не хватает'); return; } state.LC -= cost; state.farmLevel++; updateUI(); saveGame(); renderShop(); }
-
-        // ======== МИССИИ ========
-        function openMissions() { document.getElementById('missionsModal').style.display = 'flex'; renderMissions(); }
-
-        function renderMissions() {
-            const list = document.getElementById('missions-list');
-            let html = '';
-            if (state.missions.taps >= 50) { html += `<div class="mission">Сделать 50 тапов <button onclick="claimMission(1)">+500 LC</button></div>`; }
-            else { html += `<div class="mission">Сделать 50 тапов (${state.missions.taps}/50)</div>`; }
-            if (state.missions.casinoWins >= 3) { html += `<div class="mission">Выиграть 3 раза в казино <button onclick="claimMission(2)">+2 QC</button></div>`; }
-            else { html += `<div class="mission">Выиграть 3 раза в казино (${state.missions.casinoWins}/3)</div>`; }
-            list.innerHTML = html;
-        }
-
-        function claimMission(num) {
-            if (num === 1 && state.missions.taps >= 50) { state.LC += 500; state.missions.taps = 0; }
-            if (num === 2 && state.missions.casinoWins >= 3) { state.QC += 2; state.missions.casinoWins = 0; }
-            updateUI(); saveGame(); renderMissions();
-        }
-
-        // ======== НАСТРОЙКИ ========
-        function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
-
-        function toggleSound() {
-            state.soundOn = !state.soundOn;
-            document.getElementById('soundBtn').innerText = state.soundOn ? 'Вкл' : 'Выкл';
-            saveGame();
-        }
-
-        function toggleVibration() {
-            state.vibroOn = !state.vibroOn;
-            document.getElementById('vibroBtn').innerText = state.vibroOn ? 'Вкл' : 'Выкл';
-            saveGame();
-        }
-
-        function doPrestige() {
-            if (confirm('Сбросить прогресс ради +10% к доходу навсегда?')) {
-                state.LC = 0; state.energy = 100; state.robots = 0; state.farmLevel = 0;
-                state.prestige++;
-                updateUI(); saveGame();
-            }
-        }
-
-        // ======== ПАССИВНЫЙ ДОХОД ========
-        setInterval(() => {
-            const passive = (state.robots * 100 + state.farmLevel * 250) * state.multiplier * (1 + state.prestige * 0.1);
-            state.LC += passive / 3600;
-            if (state.energy < state.maxEnergy) { state.energy += 1; if (state.energy > state.maxEnergy) state.energy = state.maxEnergy; }
-            if (state.multiplierTimer > 0) { state.multiplierTimer--; if (state.multiplierTimer === 0) state.multiplier = 1; }
-            updateUI(); saveGame();
-        }, 1000);
-
-        // ======== БУСТ ========
-        function activateBoost() {
-            if (state.energy < 50) { alert('Нужно 50 энергии!'); return; }
-            state.energy -= 50; state.multiplier = 2; state.multiplierTimer = 60;
-            alert('Буст: x2 на 1 минуту!'); updateUI(); saveGame();
-        }
-
-        // ======== КОМБО ========
-        function openCombo() { document.getElementById('comboModal').style.display = 'flex'; }
-
-        function checkCombo() {
-            const val = document.getElementById('comboInput').value;
-            if (val === '7777' && !state.comboDone) { state.LC += 1000000; state.comboDone = true; alert('Красавчик! +1,000,000 LC!'); }
-            else alert('Неверно или уже использовано');
-            document.getElementById('comboInput').value = '';
-        }
-
-        // ======== ЗВУКИ ========
-        function playSound(type) {
-            if (!state.soundOn) return;
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator(); const gain = ctx.createGain();
-                osc.connect(gain); gain.connect(ctx.destination);
-                if (type === 'win') { osc.frequency.value = 700; gain.gain.setValueAtTime(0.2, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5); osc.start(); osc.stop(ctx.currentTime + 0.5); }
-                else if (type === 'lose') { osc.frequency.value = 200; gain.gain.setValueAtTime(0.2, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); osc.start(); osc.stop(ctx.currentTime + 0.3); }
-                else if (type === 'crit') { osc.frequency.value = 1200; gain.gain.setValueAtTime(0.3, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4); osc.start(); osc.stop(ctx.currentTime + 0.4); }
-                else { osc.frequency.value = 800; gain.gain.setValueAtTime(0.1, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1); osc.start(); osc.stop(ctx.currentTime + 0.1); }
-            } catch(e) {}
-        }
-
-        // ======== TELEGRAM ========
-        if (window.Telegram && window.Telegram.WebApp) { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); }
-
-        // ======== ИНИЦИАЛИЗАЦИЯ ========
-        loadGame();
-        updateUI();
-        saveGame();
-    </script>
+    <script src="game.js"></script>
 </body>
-</html>
+                    </html>
