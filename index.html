@@ -3,275 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEON HAMSTER: CASINO TYCOON</title>
+    <title>METRO ROYALE 2D</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #0b0f14; color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #0a0f14; overflow: hidden; touch-action: none; }
+        #gameCanvas { display: block; width: 100vw; height: 100vh; }
         
-        /* Верхняя панель */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #131720; border-bottom: 2px solid #ffd700; }
-        .user-info { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 48px; height: 48px; border-radius: 50%; background: #333; border: 2px solid #ffd700; display: flex; align-items: center; justify-content: center; font-size: 28px; }
-        .user-name { font-weight: 800; font-size: 15px; }
-        .user-level { font-size: 11px; color: #aaa; }
-        .profit { background: #222; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; color: #ffd700; }
-        .settings { font-size: 26px; cursor: pointer; color: #aaa; }
-
-        /* Меню - 2 колонки */
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; }
-        .menu-card { background: #1a1f28; border: 1px solid #2a2f3a; border-radius: 14px; padding: 14px; text-align: center; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        .menu-card:active { transform: scale(0.96); }
-        .menu-card .icon { font-size: 32px; margin-bottom: 6px; }
-        .menu-card .title { font-size: 13px; font-weight: 700; color: #ccc; }
-
-        /* Центр */
-        .main-zone { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .coin-display { display: flex; align-items: center; gap: 10px; font-size: 42px; font-weight: 900; color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.5); margin-bottom: 15px; }
-        .coin-icon { width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle, #ffe082, #ffb300); display: flex; align-items: center; justify-content: center; font-size: 26px; color: #111; }
-        .hamster-ring { width: 280px; height: 280px; border-radius: 50%; background: #12151c; border: 4px solid #2196f3; box-shadow: 0 0 20px rgba(33,150,243,0.4); position: relative; cursor: pointer; }
-        .hamster-ring:active { transform: scale(0.97); }
-        .hamster { width: 260px; height: 260px; }
-
-        /* Нижняя панель */
-        .bottom-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #131720; border-top: 2px solid #ffd700; }
-        .energy { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #ffd700; }
-        .energy-bar { width: 130px; height: 10px; background: #333; border-radius: 6px; overflow: hidden; }
-        .energy-fill { height: 100%; background: #ffd700; }
-        .boost { background: #2196f3; padding: 10px 20px; border-radius: 20px; font-weight: 800; color: #fff; cursor: pointer; }
-
-        /* Модалки */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 999; }
-        .modal-content { background: #1a1f28; padding: 20px; border-radius: 20px; width: 92%; max-width: 400px; border: 2px solid #333; max-height: 90vh; overflow-y: auto; position: relative; }
-        .modal-content h3 { margin-bottom: 15px; color: #ffd700; }
-        .close { position: absolute; top: 10px; right: 15px; font-size: 30px; cursor: pointer; color: #fff; z-index: 10; }
-        .close:hover { color: #ffd700; }
-        .item { background: #222; padding: 12px; margin: 8px 0; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        /* HUD */
+        #hud { position: fixed; top: 10px; left: 10px; right: 10px; display: flex; flex-direction: column; pointer-events: none; z-index: 10; }
+        .hud-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .hud-item { background: rgba(0,0,0,0.75); padding: 6px 14px; border-radius: 20px; font-size: 14px; font-weight: bold; color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+        .hud-item .icon { margin-right: 6px; }
+        #hpBar { color: #ff5252; }
+        #ammoBar { color: #ffd700; }
+        #moneyBar { color: #4caf50; }
+        #lootBar { color: #2196f3; }
+        #levelBar { color: #ff9800; }
+        #xpBar { color: #9c27b0; }
+        
+        /* Контролы */
+        #controls { position: fixed; bottom: 20px; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 20px; pointer-events: none; z-index: 10; }
+        #joystick { width: 140px; height: 140px; background: rgba(255,255,255,0.15); border: 3px solid #fff; border-radius: 50%; position: relative; pointer-events: auto; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+        #joystickKnob { width: 60px; height: 60px; background: #fff; border-radius: 50%; position: absolute; top: 40px; left: 40px; transition: transform 0.1s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        #fireBtn { width: 90px; height: 90px; background: radial-gradient(circle, #ff5252, #d32f2f); border-radius: 50%; border: 3px solid #ffab91; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; color: #fff; pointer-events: auto; box-shadow: 0 8px 20px rgba(255,82,82,0.4); }
+        #fireBtn:active { transform: scale(0.9); }
+        #menuBtn { position: fixed; bottom: 140px; right: 20px; background: #ffd700; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 30px; cursor: pointer; z-index: 20; box-shadow: 0 8px 20px rgba(255,215,0,0.4); }
+        
+        /* Миникарта и кнопка карты */
+        #minimap { position: fixed; top: 70px; right: 10px; width: 140px; height: 140px; background: rgba(0,0,0,0.6); border-radius: 10px; border: 2px solid #444; z-index: 10; pointer-events: auto; cursor: pointer; }
+        #mapModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 100; }
+        #mapCanvas { width: 90%; max-width: 500px; height: 90%; background: #1a1f2a; border-radius: 20px; border: 2px solid #ffd700; }
+        
+        /* Модалка магазина */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 50; }
+        .modal-content { background: #1a1f2a; width: 92%; max-width: 420px; padding: 20px; border-radius: 20px; max-height: 85vh; overflow-y: auto; border: 2px solid #333; }
+        .closeModal { position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; color: #fff; background: none; border: none; }
+        .tab { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab button { flex: 1; padding: 12px; background: #333; border: none; color: #fff; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .tab button.active { background: #ffd700; color: #111; }
+        .item { background: #222; padding: 12px; margin: 8px 0; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
         .item button { background: #ffd700; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; color: #111; }
-        .slot-machine { font-size: 50px; text-align: center; margin: 20px 0; letter-spacing: 10px; }
-        .result { text-align: center; font-size: 16px; margin: 10px 0; font-weight: bold; }
-        .mission { display: flex; justify-content: space-between; background: #222; padding: 10px; margin: 8px 0; border-radius: 10px; align-items: center; }
-        .mission button { background: #ffd700; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; }
-        .achievement { background: #222; padding: 10px; margin: 8px 0; border-radius: 8px; display: flex; justify-content: space-between; }
-        .floating-text { position: absolute; font-size: 24px; font-weight: 900; color: #ffd700; animation: floatUp 0.8s forwards; pointer-events: none; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
-        #offline-reward { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #4caf50; padding: 10px 20px; border-radius: 20px; z-index: 999; font-weight: bold; }
-        .wheel-container { position: relative; width: 280px; height: 280px; margin: 20px auto; }
-        #wheelSvg { width: 100%; height: 100%; }
-        .pointer { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #ffd700; z-index: 10; }
+        .item button.sell { background: #f44336; color: #fff; }
+        .rarity-common { border-left: 4px solid #b0bec5; }
+        .rarity-rare { border-left: 4px solid #2196f3; }
+        .rarity-epic { border-left: 4px solid #9c27b0; }
+        .rarity-mythic { border-left: 4px solid #ff9800; }
+        .rarity-legendary { border-left: 4px solid #ffd700; }
+        
+        #zoneWarning { position: fixed; top: 40%; left: 50%; transform: translate(-50%,-50%); color: #ff5252; font-size: 30px; font-weight: 900; text-shadow: 0 0 20px #ff5252; pointer-events: none; display: none; z-index: 100; }
+        #extractBtn { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #4caf50; padding: 15px 30px; border-radius: 30px; font-weight: bold; color: #fff; display: none; z-index: 50; cursor: pointer; box-shadow: 0 8px 20px rgba(76,175,80,0.5); }
     </style>
 </head>
 <body>
-    <div id="offline-reward"></div>
-
-    <!-- Верхняя панель -->
-    <div class="top-bar">
-        <div class="user-info">
-            <div class="avatar" id="avatar">🐹</div>
-            <div>
-                <div class="user-name">CEO</div>
-                <div class="user-level" id="hamsterLevel">Level 1</div>
+    <canvas id="gameCanvas"></canvas>
+    <div id="hud">
+        <div class="hud-row">
+            <div class="hud-item" id="hpBar"><span class="icon">❤️</span> 100</div>
+            <div class="hud-item" id="ammoBar"><span class="icon">🔫</span> 30/120</div>
+        </div>
+        <div class="hud-row">
+            <div class="hud-item" id="moneyBar"><span class="icon">💰</span> 0</div>
+            <div class="hud-item" id="lootBar"><span class="icon">🎒</span> 0</div>
+        </div>
+        <div class="hud-row">
+            <div class="hud-item" id="levelBar"><span class="icon">⭐</span> Уровень 1</div>
+            <div class="hud-item" id="xpBar"><span class="icon">✨</span> 0/100</div>
+        </div>
+    </div>
+    <canvas id="minimap" width="140" height="140" onclick="openMap()"></canvas>
+    <div id="zoneWarning">⚠️ ВЫХОДИ ИЗ ЗОНЫ!</div>
+    <div id="extractBtn" onclick="extract()">🏃 ВЫЙТИ</div>
+    <button id="menuBtn" onclick="toggleShop()">🎒</button>
+    <div id="controls">
+        <div id="joystick"><div id="joystickKnob"></div></div>
+        <button id="fireBtn">🔥</button>
+    </div>
+    
+    <!-- Модалка карты -->
+    <div id="mapModal">
+        <canvas id="mapCanvas" width="500" height="500"></canvas>
+        <button class="closeModal" onclick="closeMap()" style="position:absolute; top:20px; right:20px;">×</button>
+    </div>
+    
+    <!-- Модалка магазина/инвентаря/заданий -->
+    <div id="shopModal" class="modal">
+        <div id="shopContent" class="modal-content">
+            <button class="closeModal" onclick="toggleShop()">×</button>
+            <h2 style="margin-bottom:20px; color:#ffd700;">🎒 Меню</h2>
+            <div class="tab">
+                <button onclick="switchTab('shop')" id="tabShop" class="active">Магазин</button>
+                <button onclick="switchTab('inv')" id="tabInv">Инвентарь</button>
+                <button onclick="switchTab('quests')" id="tabQuests">Задания</button>
             </div>
-        </div>
-        <div class="profit">💎 <span id="profit">+0</span>/ч</div>
-        <div class="settings" onclick="openSettings()">⚙️</div>
-    </div>
-
-    <!-- Меню -->
-    <div class="menu-grid">
-        <div class="menu-card" onclick="openWheel()"><div class="icon">🎡</div><div class="title">Колесо</div></div>
-        <div class="menu-card" onclick="openCasino()"><div class="icon">🎰</div><div class="title">Казино</div></div>
-        <div class="menu-card" onclick="openMissions()"><div class="icon">📜</div><div class="title">Миссии</div></div>
-        <div class="menu-card" onclick="openShop()"><div class="icon">🛒</div><div class="title">Магазин</div></div>
-        <div class="menu-card" onclick="openAchievements()"><div class="icon">🏆</div><div class="title">Достижения</div></div>
-        <div class="menu-card" onclick="openDaily()"><div class="icon">🎁</div><div class="title">Награда</div></div>
-        <div class="menu-card" onclick="openBoss()"><div class="icon">👹</div><div class="title">Босс</div></div>
-        <div class="menu-card" onclick="openMiniGames()"><div class="icon">🎲</div><div class="title">Мини-игры</div></div>
-        <div class="menu-card" onclick="openCards()"><div class="icon">🃏</div><div class="title">Карты</div></div>
-        <div class="menu-card" onclick="openAuction()"><div class="icon">🔨</div><div class="title">Аукцион</div></div>
-        <div class="menu-card" onclick="openCipher()"><div class="icon">🔢</div><div class="title">Шифр</div></div>
-        <div class="menu-card" onclick="openLeaderboard()"><div class="icon">📊</div><div class="title">Лидеры</div></div>
-    </div>
-
-    <!-- Центр -->
-    <div class="main-zone">
-        <div class="coin-display">
-            <div class="coin-icon">$</div>
-            <div id="coinCount">0</div>
-        </div>
-        <div class="hamster-ring" id="hamster" onclick="tap(event)">
-            <svg class="hamster" viewBox="0 0 200 200" id="hamsterSvg">
-                <defs>
-                    <radialGradient id="fur" cx="40%" cy="30%" r="60%">
-                        <stop offset="0%" style="stop-color:#f5d0a9"/>
-                        <stop offset="100%" style="stop-color:#c47a3a"/>
-                    </radialGradient>
-                </defs>
-                <!-- Ноги -->
-                <ellipse cx="75" cy="185" rx="20" ry="12" fill="#111"/>
-                <ellipse cx="125" cy="185" rx="20" ry="12" fill="#111"/>
-                <!-- Тело (Пиджак) -->
-                <path d="M60,190 C60,140 40,110 50,80 C60,55 100,45 150,55 C180,65 170,105 160,140 C150,180 155,190 155,190" fill="#1a1a1a"/>
-                <!-- Рубашка -->
-                <path d="M80,100 L120,100 L100,140" fill="#f0f0f0"/>
-                <!-- Галстук -->
-                <polygon points="90,100 110,100 100,160" fill="#ff9800"/>
-                <!-- Руки -->
-                <path d="M45,130 Q30,140 35,150" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/>
-                <path d="M155,130 Q170,140 165,150" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/>
-                <!-- Голова -->
-                <ellipse cx="100" cy="65" rx="60" ry="50" fill="url(#fur)"/>
-                <!-- Уши -->
-                <ellipse cx="55" cy="25" rx="20" ry="15" fill="#c47a3a"/>
-                <ellipse cx="145" cy="25" rx="20" ry="15" fill="#c47a3a"/>
-                <ellipse cx="55" cy="25" rx="10" ry="7" fill="#a0522d"/>
-                <ellipse cx="145" cy="25" rx="10" ry="7" fill="#a0522d"/>
-                <!-- Очки -->
-                <rect x="60" y="50" width="80" height="24" rx="12" fill="#111"/>
-                <line x1="65" y1="55" x2="75" y2="65" stroke="#fff" stroke-width="3" opacity="0.6"/>
-                <line x1="130" y1="55" x2="140" y2="65" stroke="#fff" stroke-width="3" opacity="0.6"/>
-                <!-- Рот -->
-                <path d="M85,90 Q100,100 115,90" stroke="#5d4037" stroke-width="4" fill="none"/>
-                <!-- Брови -->
-                <line x1="70" y1="45" x2="85" y2="47" stroke="#5d4037" stroke-width="4"/>
-                <line x1="130" y1="45" x2="115" y2="47" stroke="#5d4037" stroke-width="4"/>
-            </svg>
+            <div id="shopItems"></div>
+            <div id="invItems" style="display:none;"></div>
+            <div id="questItems" style="display:none;"></div>
         </div>
     </div>
-
-    <!-- Нижняя панель -->
-    <div class="bottom-bar">
-        <div class="energy">
-            <span>⚡</span>
-            <div class="energy-bar"><div class="energy-fill" id="energyFill"></div></div>
-            <span id="energyCount">100/100</span>
-        </div>
-        <div class="boost" onclick="activateBoost()">🚀 Boost</div>
-    </div>
-
-    <!-- Модалки (все) -->
-    <div class="modal" id="wheelModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('wheelModal')">&times;</span>
-            <h3>🎡 Колесо Фортуны</h3>
-            <div class="wheel-container">
-                <div class="pointer"></div>
-                <svg id="wheelSvg" viewBox="0 0 200 200"></svg>
-            </div>
-            <div class="result" id="wheel-result"></div>
-            <button class="boost" onclick="spinWheel()" style="width:100%; margin-top:10px;">Крутить</button>
-        </div>
-    </div>
-
-    <div class="modal" id="casinoModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('casinoModal')">&times;</span>
-            <h3>🎰 Казино</h3>
-            <p>Ставка: 100 LC</p>
-            <div class="slot-machine" id="slot-machine">🍒 💎 7️⃣</div>
-            <div class="result" id="casino-result"></div>
-            <button class="boost" onclick="spinSlot()" style="width:100%; margin-top:10px;">Крутить</button>
-        </div>
-    </div>
-
-    <div class="modal" id="shopModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('shopModal')">&times;</span>
-            <h3>🛒 Магазин</h3>
-            <div id="shop-items"></div>
-        </div>
-    </div>
-
-    <div class="modal" id="missionsModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('missionsModal')">&times;</span>
-            <h3>📜 Ежедневные миссии</h3>
-            <div id="missions-list"></div>
-        </div>
-    </div>
-
-    <div class="modal" id="settingsModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('settingsModal')">&times;</span>
-            <h3>⚙️ Настройки</h3>
-            <div class="item">Звук <button id="soundBtn" onclick="toggleSound()">Вкл</button></div>
-            <div class="item">Вибрация <button id="vibroBtn" onclick="toggleVibration()">Вкл</button></div>
-            <div class="item">Престиж (сброс) <button onclick="doPrestige()">Сброс</button></div>
-            <div class="item">Реферальная ссылка <button onclick="copyReferral()">Копировать</button></div>
-        </div>
-    </div>
-
-    <div class="modal" id="achievementsModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('achievementsModal')">&times;</span>
-            <h3>🏆 Достижения</h3>
-            <div id="achievements-list"></div>
-        </div>
-    </div>
-
-    <div class="modal" id="dailyModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('dailyModal')">&times;</span>
-            <h3>🎁 Ежедневная награда</h3>
-            <div id="daily-reward"></div>
-            <button class="boost" onclick="claimDaily()" style="width:100%; margin-top:10px;">Получить</button>
-        </div>
-    </div>
-
-    <div class="modal" id="bossModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('bossModal')">&times;</span>
-            <h3>👹 Босс дня</h3>
-            <div id="boss-info"></div>
-            <button class="boost" onclick="attackBoss()" style="width:100%; margin-top:10px;">Атаковать</button>
-        </div>
-    </div>
-
-    <div class="modal" id="miniGamesModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('miniGamesModal')">&times;</span>
-            <h3>🎲 Мини-игры</h3>
-            <button onclick="playCoinFlip()" style="width:100%; margin-bottom:10px;">Орёл/Решка (ставка 50 LC)</button>
-            <button onclick="playGuessNumber()" style="width:100%; margin-bottom:10px;">Угадай число (ставка 20 LC)</button>
-            <div id="mini-result"></div>
-        </div>
-    </div>
-
-    <div class="modal" id="cardsModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('cardsModal')">&times;</span>
-            <h3>🃏 Коллекция карт</h3>
-            <div id="cards-collection"></div>
-            <button class="boost" onclick="drawCard()" style="width:100%; margin-top:10px;">Открыть карту (500 LC)</button>
-        </div>
-    </div>
-
-    <div class="modal" id="auctionModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('auctionModal')">&times;</span>
-            <h3>🔨 Аукцион скинов</h3>
-            <div id="auction-items"></div>
-        </div>
-    </div>
-
-    <div class="modal" id="cipherModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('cipherModal')">&times;</span>
-            <h3>🔢 Ежедневный шифр</h3>
-            <p>Введи 4-значный код для награды</p>
-            <input type="number" id="cipherInput" style="width:100%; padding:10px; margin:10px 0;">
-            <button onclick="checkCipher()" style="width:100%;">Проверить</button>
-            <div id="cipher-result"></div>
-        </div>
-    </div>
-
-    <div class="modal" id="leaderboardModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('leaderboardModal')">&times;</span>
-            <h3>📊 Локальный лидерборд</h3>
-            <div id="leaderboard-list"></div>
-        </div>
-    </div>
-
     <script src="game.js"></script>
 </body>
-                    </html>
+</html>
