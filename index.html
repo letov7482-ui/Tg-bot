@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Собеседник — тестовый чат</title>
+<style>
+  :root{
+    --bg: #12141c;
+    --panel: #1a1d29;
+    --panel-2: #202436;
+    --line: #2c2f42;
+    --ink: #e9e9f1;
+    --muted: #8d90a8;
+    --accent: #f2a341;
+    --accent-soft: rgba(242,163,65,.14);
+    --bot-bubble: #232741;
+    --user-bubble: #f2a341;
+    --user-ink: #1b1408;
+    font-size: 16px;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ height:100%; margin:0; }
+  body{
+    background: radial-gradient(1200px 800px at 80% -10%, #23283f 0%, var(--bg) 55%) fixed;
+    color: var(--ink);
+    font-family: "Iowan Old Style","Georgia",serif;
+    display:flex;
+    justify-content:center;
+    align-items:stretch;
+    min-height:100vh;
+  }
+  .app{
+    width:100%;
+    max-width: 720px;
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+    border-left:1px solid var(--line);
+    border-right:1px solid var(--line);
+    background: var(--panel);
+  }
+  header{
+    padding: 22px 24px 16px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .avatar{
+    width:44px; height:44px; border-radius:50%;
+    background: conic-gradient(from 210deg, var(--accent), #7c5cff, var(--accent));
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; flex-shrink:0;
+  }
+  .who{ flex:1; min-width:0; }
+  .who h1{
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px; font-weight:600; margin:0; letter-spacing:.2px;
+  }
+  .who p{
+    margin:2px 0 0; font-size:13px; color:var(--muted);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    display:flex; align-items:center; gap:6px;
+  }
+  .dot{ width:7px;height:7px;border-radius:50%; background:#5ee08a; display:inline-block; }
+  .mood-tag{
+    font-size:12px; color: var(--accent);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    border:1px solid var(--accent-soft); background:var(--accent-soft);
+    padding:4px 10px; border-radius:20px; white-space:nowrap;
+  }
+
+  #log{
+    flex:1;
+    overflow-y:auto;
+    padding: 20px 20px 8px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .row{ display:flex; }
+  .row.user{ justify-content:flex-end; }
+  .bubble{
+    max-width: 78%;
+    padding: 11px 15px;
+    border-radius: 16px;
+    line-height:1.5;
+    font-size:15.5px;
+    white-space: pre-wrap;
+  }
+  .row.bot .bubble{
+    background: var(--bot-bubble);
+    border-top-left-radius:4px;
+    color: var(--ink);
+  }
+  .row.user .bubble{
+    background: var(--user-bubble);
+    color: var(--user-ink);
+    border-top-right-radius:4px;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+  .ts{
+    font-size:11px; color: var(--muted);
+    margin-top:4px; font-family:"Helvetica Neue", Arial, sans-serif;
+  }
+  .row.user .ts{ text-align:right; }
+
+  .typing{
+    display:flex; gap:4px; align-items:center; padding: 4px 2px;
+  }
+  .typing span{
+    width:6px;height:6px;border-radius:50%;background:var(--muted);
+    animation: blink 1.2s infinite ease-in-out;
+  }
+  .typing span:nth-child(2){ animation-delay:.2s; }
+  .typing span:nth-child(3){ animation-delay:.4s; }
+  @keyframes blink{ 0%,80%,100%{opacity:.25;} 40%{opacity:1;} }
+
+  .quick{
+    display:flex; gap:8px; padding: 4px 20px 14px; overflow-x:auto;
+    font-family:"Helvetica Neue", Arial, sans-serif;
+  }
+  .chip{
+    flex-shrink:0;
+    font-size:13px; color:var(--ink);
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    padding:7px 13px; border-radius:20px;
+    cursor:pointer; user-select:none;
+  }
+  .chip:hover{ border-color:var(--accent); color:var(--accent); }
+
+  form{
+    display:flex; gap:10px; padding:16px 20px 20px;
+    border-top:1px solid var(--line);
+    background:var(--panel);
+  }
+  input[type=text]{
+    flex:1;
+    background: var(--panel-2);
+    border:1px solid var(--line);
+    color:var(--ink);
+    padding:13px 16px;
+    border-radius:14px;
+    font-size:15px;
+    font-family: inherit;
+    outline:none;
+  }
+  input[type=text]:focus{ border-color: var(--accent); }
+  button{
+    background: var(--accent);
+    color: var(--user-ink);
+    border:none;
+    padding: 0 20px;
+    border-radius:14px;
+    font-family:"Helvetica Neue", Arial, sans-serif;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+  }
+  button:active{ transform: translateY(1px); }
+
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="avatar">🤖</div>
+    <div class="who">
+      <h1>Собеседник</h1>
+      <p><span class="dot"></span> тестовый ИИ-чат, работает прямо в браузере</p>
+    </div>
+    <div class="mood-tag" id="moodTag">настроение…</div>
+  </header>
+
+  <div id="log"></div>
+
+  <div class="quick" id="quick">
+    <div class="chip" data-msg="привет">привет</div>
+    <div class="chip" data-msg="анекдот">анекдот</div>
+    <div class="chip" data-msg="цитата">цитата</div>
+    <div class="chip" data-msg="гороскоп лев">гороскоп лев</div>
+    <div class="chip" data-msg="монетка">монетка</div>
+    <div class="chip" data-msg="кубик">кубик</div>
+    <div class="chip" data-msg="что ты умеешь">что ты умеешь</div>
+  </div>
+
+  <form id="form">
+    <input id="input" type="text" placeholder="Напиши что-нибудь…" autocomplete="off" />
+    <button type="submit">Отправить</button>
+  </form>
+</div>
+
+<script>
+/* =========================================================================
+   ЛОГИКА "ИИ" — та же структура, что и в telegram-версии бота (bot.py),
+   переписанная на JS, чтобы работать полностью локально в браузере
+   (без сервера и без реального подключения к Telegram).
+   ========================================================================= */
+
+// --- большой словарь триггеров: [ [ключевые слова], [варианты ответов] ]
+const TRIGGER_GROUPS = [
+  [["привет","хай","здравствуй","здарова","дарова","йо","приветик","хеллоу","ку","салют"],
+   ["Привет! 👋","Здарова! Как сам?","Хэй! Рад тебя видеть 😄","Приветствую! Чем займёмся?","Йо! На связи.","Привет-привет ✨","О, кто пришёл! Здравствуй."]],
+
+  [["пока","прощай","до свидания","увидимся","бб","чао","гудбай","до встречи","убегаю"],
+   ["Пока! Береги себя 👋","До скорого!","Увидимся!","Чао-какао 🙋","Пока-пока, заходи ещё.","Счастливо!"]],
+
+  [["как дела","как ты","как жизнь","как оно","что нового","как сам","как настроение"],
+   ["Отлично, спасибо! А у тебя как?","Всё супер, работаю без выходных 😅","Бодро и весело! А у тебя?","Как у бота — стабильно 🙂 Как ты?","Живём, крутимся. А у тебя как дела?"]],
+
+  [["спасибо","благодарю","спс","сенкс","мерси"],
+   ["Пожалуйста! 😊","Всегда рад помочь!","Обращайся!","Не за что 🙌","Всегда пожалуйста ✨"]],
+
+  [["люблю тебя","ты классный","ты крутой","ты лучший","обожаю тебя"],
+   ["Ой, спасибо! Мне приятно 🥰","Ты тоже отличный собеседник!","Взаимно! 😄","Тёпло на душе от таких слов."]],
+
+  [["ты дурак","тупой бот","ты бесполезный","плохой бот","идиот","отстой"],
+   ["Извини, если что-то пошло не так, попробуем разобраться?","Бывает, я не идеален. Расскажи, что не так?","Прости, постараюсь стать лучше 🙏"]],
+
+  [["кто ты","что ты такое","представься","как тебя зовут","твоё имя"],
+   ["Я бот-помощник, живу в этом чате 🤖","Я просто программа, но с характером!","Меня можно звать просто Бот. Рад знакомству!"]],
+
+  [["ты бот","ты робот","ты живой","ты человек"],
+   ["Да, я бот, но с чувством юмора 😉","Технически — да, робот. Но душевный.","Бот я, бот. Только продвинутый."]],
+
+  [["погода","какая погода","дождь будет","холодно на улице"],
+   ["Погоду напрямую не отслеживаю, но могу подсказать, где посмотреть 🌦","Загляни в приложение погоды — я специализируюсь на разговорах 😄"]],
+
+  [["скучно","мне скучно","заняться нечем","скука"],
+   ["Могу рассказать анекдот — напиши «анекдот»","Сыграем? Напиши «кубик»","Скука — повод для нового приключения!"]],
+
+  [["грустно","мне плохо","плохое настроение","депрессия","тоска","печаль","уныло"],
+   ["Обнимаю виртуально 🤗 Хочешь рассказать, что случилось?","Бывают такие дни. Я рядом, если что.","Держись! Иногда просто нужно выговориться."]],
+
+  [["ура","класс","супер","отлично","круто","здорово","вау"],
+   ["Ура! 🎉","Вот это дело!","Красота!","Так держать!"]],
+
+  [["мотивация","вдохнови меня","лень","не хочу ничего делать","нет сил"],
+   ["Маленький шаг лучше, чем никакого шага.","Ты уже сделал первый шаг — написал мне.","Отдохни немного и возвращайся к делу."]],
+
+  [["в чём смысл жизни","смысл жизни","зачем мы живём"],
+   ["42, если верить классике 😄","Может, смысл в том, чтобы искать смысл?","У каждого свой ответ."]],
+
+  [["спокойной ночи","иду спать","спать пора","доброй ночи"],
+   ["Спокойной ночи! Пусть приснится хорошее 🌙","Сладких снов!","Ночи! 😴"]],
+
+  [["доброе утро","с добрым утром","утро доброе"],
+   ["Доброе утро! ☀️","С добрым утром! Хорошего дня!","Просыпайся, мир ждёт тебя 🌅"]],
+
+  [["хочу есть","есть охота","проголодался","покушать"],
+   ["Может, пора перекусить? 🍕","Голод — не тётка, иди есть!"]],
+
+  [["с днём рождения","днюха","поздравляю","с праздником"],
+   ["Ура, праздник! 🎉🎂","Поздравляю от всей своей цифровой души!"]],
+];
+
+const JOKES = [
+  "Программист заходит в бар. Заказывает пиво. Заказывает 0 пива. Заказывает 999999999 пива. Заказывает ящерицу. Бар горит.",
+  "— Почему программисты путают Хэллоуин и Рождество? — Потому что OCT 31 == DEC 25.",
+  "Уровень нуля в программировании: массив начинается с единицы.",
+  "— Сколько программистов нужно, чтобы вкрутить лампочку? — Ни одного, это аппаратная проблема.",
+  "Есть два типа людей: те, кто делает бэкапы, и те, кто ещё не терял данные.",
+  "Самая страшная фраза в IT: «Работало на моей машине».",
+  "Кот прошёлся по клавиатуре и написал более рабочий код, чем я за сегодня."
+];
+
+const QUOTES = [
+  "«Единственный способ сделать что-то великое — любить то, что ты делаешь» — Стив Джобс",
+  "«Будь собой — все остальные роли уже заняты» — Оскар Уайльд",
+  "«Не бойся идти медленно, бойся стоять на месте» — китайская пословица",
+  "«Успех — это способность двигаться от неудачи к неудаче без потери энтузиазма» — Уинстон Черчилль",
+  "«Лучшее время посадить дерево было 20 лет назад. Следующее лучшее — сейчас»"
+];
+
+const HOROSCOPE = {
+  "овен":"Сегодня удачный день для новых начинаний. Дерзай!",
+  "телец":"Сосредоточься на комфорте и стабильности — они принесут плоды.",
+  "близнецы":"День общения — используй его для важных разговоров.",
+  "рак":"Прислушайся к интуиции, она сегодня особенно точна.",
+  "лев":"Твоя энергия притягивает удачу — не стесняйся проявляться.",
+  "дева":"Порядок и планирование сегодня решают всё.",
+  "весы":"Ищи баланс — в делах и в отношениях.",
+  "скорпион":"День для глубоких решений и смелых шагов.",
+  "стрелец":"Открывай новые горизонты, удача благоволит путешествиям.",
+  "козерог":"Терпение и дисциплина сегодня окупятся сполна.",
+  "водолей":"Необычные идеи сегодня — твоя суперсила.",
+  "рыбы":"Доверься творчеству и своим чувствам."
+};
+
+const HELP_TEXT =
+`Вот что я умею:
+• Просто пиши — я реагирую на десятки слов и фраз
+• «анекдот» — рассказать анекдот
+• «цитата» — умная цитата
+• «гороскоп лев» — гороскоп по знаку
+• «монетка» — подбросить монетку
+• «кубик» — бросить кубик
+• «настроение» — узнать моё текущее настроение
+• «teach: фраза|ответ» — научить меня новому ответу`;
+
+// --- обучение (сохраняется в этом браузере через localStorage,
+//     с запасным вариантом в памяти, если localStorage недоступен)
+const memoryStore = {};
+function storageGet(key){
+  try { return JSON.parse(localStorage.getItem(key)) || {}; }
+  catch(e){ return memoryStore[key] || {}; }
+}
+function storageSet(key, val){
+  try { localStorage.setItem(key, JSON.stringify(val)); }
+  catch(e){ memoryStore[key] = val; }
+}
+let learned = storageGet("learned_phrases");
+
+function teach(word, answer){
+  word = word.toLowerCase().trim();
+  if(!learned[word]) learned[word] = [];
+  if(!learned[word].includes(answer)) learned[word].push(answer);
+  storageSet("learned_phrases", learned);
+}
+
+// --- построение плоского индекса ключевых слов
+const WORD_INDEX = {};
+TRIGGER_GROUPS.forEach(([keywords, responses]) => {
+  keywords.forEach(kw => WORD_INDEX[kw] = responses);
+});
+
+function normalize(text){
+  return text.toLowerCase().trim().replace(/[^\wа-яё\s]/gi, "");
+}
+
+// --- простое нечёткое сравнение строк (аналог difflib.SequenceMatcher)
+function similarity(a, b){
+  if(a === b) return 1;
+  const longer = a.length > b.length ? a : b;
+  const shorter = a.length > b.length ? b : a;
+  if(longer.length === 0) return 1;
+  let matches = 0;
+  for(let i=0;i<shorter.length;i++){
+    if(longer.includes(shorter[i])) matches++;
+  }
+  return matches / longer.length;
+}
+
+function fuzzyMatch(text, candidates, threshold=0.6){
+  let best=null, bestScore=0;
+  candidates.forEach(c=>{
+    const s = similarity(text, c);
+    if(s > bestScore){ best=c; bestScore=s; }
+  });
+  return bestScore >= threshold ? best : null;
+}
+
+// --- "настроение" бота — меняется каждые 3 часа псевдослучайно
+const MOODS = [["бодрое","⚡"],["спокойное","😌"],["игривое","😜"],["сонное","😴"],["вдохновлённое","✨"],["философское","🤔"]];
+function seededRandom(seed){
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+function currentMood(){
+  const now = new Date();
+  const slot = Math.floor(now.getHours()/3) + now.getDate()*100;
+  const idx = Math.floor(seededRandom(slot) * MOODS.length);
+  return MOODS[idx];
+}
+function isNight(){
+  const h = new Date().getHours();
+  return h >= 0 && h < 6;
+}
+
+function applyMoodTone(text){
+  const [name, emoji] = currentMood();
+  if(isNight()) return `${text} ${emoji}\n(сейчас ночь, отвечаю тише обычного)`;
+  return `${text} ${emoji}`;
+}
+
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+// --- основная функция генерации ответа
+function findResponse(raw){
+  const norm = normalize(raw);
+
+  // спец-команды
+  if(norm.startsWith("teach:") || raw.includes("|") && raw.toLowerCase().startsWith("teach")){
+    const body = raw.replace(/teach:?/i, "").trim();
+    const [word, answer] = body.split("|").map(s => s && s.trim());
+    if(word && answer){
+      teach(word, answer);
+      return `Запомнил! Теперь на «${word}» я могу ответить: «${answer}» 🧠`;
+    }
+    return "Формат: teach: фраза|твой ответ";
+  }
+  if(["сколько времени","который час"].some(w=>norm.includes(w))){
+    return `Сейчас ${new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"})} ⏰`;
+  }
+  if(["какое сегодня число","какой день"].some(w=>norm.includes(w))){
+    return `Сегодня ${new Date().toLocaleDateString("ru-RU")} 📅`;
+  }
+  if(["что ты умеешь","твои функции","команды","помощь","help"].some(w=>norm.includes(w))){
+    return HELP_TEXT;
+  }
+  if(norm.includes("анекдот") || norm.includes("пошути") || norm.includes("расскажи шутку")){
+    return pick(JOKES);
+  }
+  if(norm.includes("цитата") || norm.includes("мудрость") || norm.includes("афоризм")){
+    return pick(QUOTES);
+  }
+  if(norm.includes("гороскоп")){
+    const sign = Object.keys(HOROSCOPE).find(s => norm.includes(s));
+    if(sign) return `${sign[0].toUpperCase()+sign.slice(1)}: ${HOROSCOPE[sign]}`;
+    return "Укажи знак зодиака, например: «гороскоп лев»";
+  }
+  if(norm.includes("монетк")){
+    return pick(["Орёл! 🪙","Решка! 🪙"]);
+  }
+  if(norm.includes("кубик")){
+    return `Выпало: ${1+Math.floor(Math.random()*6)} 🎲`;
+  }
+  if(norm.includes("настроение") && norm.includes("тво") === false && norm.includes("как настроение")===false){
+    const [name, emoji] = currentMood();
+    return `Моё текущее настроение: ${name} ${emoji}`;
+  }
+
+  // 1. точное совпадение по ключевым словам
+  for(const kw in WORD_INDEX){
+    if(norm.includes(kw)) return applyMoodTone(pick(WORD_INDEX[kw]));
+  }
+  // 2. выученные фразы
+  for(const kw in learned){
+    if(norm.includes(kw) && learned[kw].length) return applyMoodTone(pick(learned[kw]));
+  }
+  // 3. нечёткий поиск
+  const allKeywords = Object.keys(WORD_INDEX).concat(Object.keys(learned));
+  const match = fuzzyMatch(norm, allKeywords, 0.55);
+  if(match){
+    const pool = WORD_INDEX[match] || learned[match];
+    if(pool && pool.length) return "Похоже, ты имел в виду что-то похожее 🙂\n" + applyMoodTone(pick(pool));
+  }
+
+  return "Хм, пока не знаю, как на это ответить 🤷\nНаучи меня: «teach: твоя фраза|желаемый ответ»";
+}
+
+/* =========================================================================
+   ИНТЕРФЕЙС ЧАТА
+   ========================================================================= */
+
+const log = document.getElementById("log");
+const form = document.getElementById("form");
+const input = document.getElementById("input");
+const moodTag = document.getElementById("moodTag");
+const quick = document.getElementById("quick");
+
+function timestamp(){
+  return new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
+}
+
+function addMessage(text, who){
+  const row = document.createElement("div");
+  row.className = "row " + who;
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = text;
+  const wrap = document.createElement("div");
+  wrap.appendChild(bubble);
+  const ts = document.createElement("div");
+  ts.className = "ts";
+  ts.textContent = timestamp();
+  wrap.appendChild(ts);
+  row.appendChild(wrap);
+  log.appendChild(row);
+  log.scrollTop = log.scrollHeight;
+}
+
+function showTyping(){
+  const row = document.createElement("div");
+  row.className = "row bot";
+  row.id = "typingRow";
+  row.innerHTML = `<div class="bubble typing"><span></span><span></span><span></span></div>`;
+  log.appendChild(row);
+  log.scrollTop = log.scrollHeight;
+}
+function hideTyping(){
+  const row = document.getElementById("typingRow");
+  if(row) row.remove();
+}
+
+function refreshMoodTag(){
+  const [name, emoji] = currentMood();
+  moodTag.textContent = `${emoji} ${name}${isNight() ? " · ночь" : ""}`;
+}
+
+function respond(userText){
+  addMessage(userText, "user");
+  showTyping();
+  const delay = 500 + Math.random()*700;
+  setTimeout(() => {
+    hideTyping();
+    const answer = findResponse(userText);
+    addMessage(answer, "bot");
+    refreshMoodTag();
+  }, delay);
+}
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = "";
+  respond(text);
+});
+
+quick.addEventListener("click", (e) => {
+  const chip = e.target.closest(".chip");
+  if(!chip) return;
+  respond(chip.dataset.msg);
+});
+
+// приветственное сообщение при загрузке
+window.addEventListener("load", () => {
+  refreshMoodTag();
+  setTimeout(() => {
+    addMessage("Привет! Я тестовый ИИ-собеседник 🤖 Спрашивай что угодно — попробуй «анекдот», «гороскоп лев» или просто поболтай.", "bot");
+  }, 300);
+});
+</script>
+</body>
+</html>
