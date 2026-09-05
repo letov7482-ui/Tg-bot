@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Metro Extraction — Telegram Mini App Prototype</title>
+<style>
+:root{--bg:#0b0d0c;--panel:#151816;--panel2:#1d211e;--line:#444b43;--text:#eee9dc;--muted:#9f9b8d;--gold:#d6aa55;--red:#d65b50;--green:#76a86c}
+*{box-sizing:border-box}html,body{margin:0;background:#050605;color:var(--text);font-family:Inter,system-ui,Arial,sans-serif;height:100%;overflow:hidden}
+button{font:inherit;color:inherit;border:1px solid #555b52;background:#20241f;border-radius:6px;padding:10px 14px;cursor:pointer}
+button:hover{background:#2a2f29}.primary{background:#8d6b32;border-color:#c29b4f;color:#fff}.danger{background:#6e2b27}.good{background:#285234}
+#app{height:100%;display:flex;flex-direction:column}.top{height:54px;background:#111411;border-bottom:1px solid #333830;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:3}
+.logo{font-weight:900;letter-spacing:2px}.stats{display:flex;gap:18px;font-size:14px}.gold{color:var(--gold)}
+.screen{flex:1;min-height:0;position:relative}.hidden{display:none!important}
+#lobby{height:100%;min-height:0;display:grid;overflow:auto;grid-template-columns:270px 1fr 340px;gap:10px;padding:10px;background:radial-gradient(circle at 50% 20%,#263027 0,#0b0d0c 60%)}
+.panel{background:rgba(17,20,17,.94);border:1px solid #363c35;border-radius:8px;box-shadow:0 8px 30px #0008}.side{padding:12px;display:flex;flex-direction:column;gap:8px}.side h3,.panel h3{margin:3px 0 10px;font-size:13px;color:#c8c4b6;text-transform:uppercase;letter-spacing:1px}
+.menu button{text-align:left;width:100%;margin:3px 0}.hero{position:relative;overflow:hidden;display:flex;flex-direction:column}.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(#0001,#0009),radial-gradient(circle at 55% 45%,#5b5c4a 0,#232a23 35%,#0c100d 75%);opacity:.9}
+.heroContent{position:relative;z-index:1;padding:25px;display:flex;flex-direction:column;height:100%;justify-content:flex-end}
+.soldier{position:absolute;z-index:1;left:50%;top:11%;transform:translateX(-50%);width:150px;height:270px;filter:drop-shadow(0 15px 20px #000)}
+.soldier .head{width:52px;height:52px;background:#343b36;border:4px solid #151915;border-radius:45% 45% 38% 38%;margin:auto}.soldier .body{width:100px;height:130px;background:linear-gradient(90deg,#1c231e,#566052,#202720);border:4px solid #131713;border-radius:25px;margin:8px auto}.soldier .legs{display:flex;gap:10px;justify-content:center}.soldier .leg{width:38px;height:95px;background:#222821;border:4px solid #131713;border-radius:12px}.soldier .gun{position:absolute;width:145px;height:18px;background:#161916;border:3px solid #090a09;right:-32px;top:145px;transform:rotate(17deg);border-radius:4px}
+.hero h1{font-size:34px;margin:0 0 5px}.hero p{color:#b8b3a4;max-width:550px}.loadout{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.slot{background:#1b1f1b;border:1px solid #454a43;border-radius:6px;padding:8px;min-height:70px}.slot small{display:block;color:#8e8b80}.slot b{font-size:13px}
+.inv{padding:12px;overflow:auto;min-height:0}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.item{min-height:72px;background:#20241f;border:1px solid #444b42;border-radius:5px;padding:7px;position:relative}.item.r{border-color:#8c6eb1}.item.e{border-color:#4c86a5}.item.l{border-color:#b58c45}.item .icon{font-size:24px}.item small{display:block;color:#a6a295}.qty{position:absolute;right:5px;bottom:4px;color:#ddd}
+#raid{position:absolute;inset:0;background:#080b09}.raidCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;background:#111}
+.hud{position:absolute;inset:0;pointer-events:none}.hud>*{pointer-events:auto}.hudTop{position:absolute;left:12px;right:12px;top:10px;display:flex;justify-content:space-between;align-items:flex-start}.hudBox{background:#0a0c0bcc;border:1px solid #41473f;border-radius:6px;padding:8px}.hp{width:210px}.bar{height:8px;background:#252925;border-radius:4px;overflow:hidden;margin-top:5px}.bar i{display:block;height:100%;background:var(--green);width:100%}.ammo{font-size:25px;font-weight:800}.mini{width:160px;height:120px;background:#182018dd;border:1px solid #596054;border-radius:5px;position:relative;overflow:hidden}.mini:after{content:"";position:absolute;inset:18px;border:1px solid #64705e;border-radius:50%}.cross{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:30px;color:#ddd}.eventlog{position:absolute;left:12px;bottom:105px;width:320px;max-height:130px;overflow:hidden;font-size:12px;text-shadow:0 1px 2px #000}.eventlog div{margin:3px 0}.controls{position:absolute;left:0;right:0;bottom:0;height:105px;display:flex;justify-content:space-between;align-items:center;padding:12px;pointer-events:none}.movePad{width:132px;height:112px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.moveRow{display:flex;gap:2px;align-items:center}.moveBtn{width:42px;height:38px;padding:0;border-radius:8px;background:#111511cc;border:1px solid #7c8378;font-size:17px;font-weight:900;touch-action:none;user-select:none}.moveBtn:active,.moveBtn.active{background:#8d6b32;border-color:#d2aa5e;transform:scale(.96)}
+.actions{display:flex;gap:8px;align-items:center}.actions button{width:62px;height:62px;border-radius:50%;background:#101310cc}.fire{width:82px!important;height:82px!important;background:#6e302acc!important;border-color:#c66!important}.hint{position:absolute;top:48%;left:50%;transform:translate(-50%,-50%);background:#090b09d9;padding:12px 18px;border:1px solid #777;border-radius:7px;text-align:center}
+#modal{position:absolute;inset:0;background:#0009;display:flex;align-items:center;justify-content:center;z-index:20}.modalBox{width:min(700px,94vw);max-height:90vh;overflow:auto;background:#151816;border:1px solid #555d52;border-radius:9px;padding:18px}.modalHead{display:flex;justify-content:space-between;align-items:center}.marketGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.marketCard{border:1px solid #444b42;background:#20241f;padding:10px;border-radius:6px}.marketCard b{display:block;margin-bottom:4px}.tabrow{display:flex;gap:5px;margin-bottom:12px}
+@media(max-width:900px){#lobby{grid-template-columns:1fr}.side,.rightPanel{display:none}.hero{min-height:500px}.grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:560px){
+.stats{gap:7px;font-size:11px}.logo{font-size:13px}.hero h1{font-size:25px}.loadout{grid-template-columns:repeat(2,1fr)}.marketGrid{grid-template-columns:repeat(2,1fr)}
+#lobby{display:block;height:auto;min-height:100%;padding:7px}.hero{min-height:620px;margin-bottom:8px}.side{margin-bottom:8px}.rightPanel{display:block;min-height:420px}
+.controls{height:126px;padding:8px 10px;align-items:flex-end}.movePad{margin-bottom:0}.actions{gap:5px}.actions button{width:54px;height:54px}.fire{width:70px!important;height:70px!important}
+.hudTop{gap:5px}.hp{width:155px}.mini{width:120px;height:90px}.ammo{font-size:19px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+<header class="top"><div class="logo">METRO EXTRACTION</div><div class="stats"><span>₽ <b id="money">125000</b></span><span>★ <b id="xp">0</b></span><span>Ур. <b id="level">1</b></span></div></header>
+<main class="screen">
+<section id="lobby">
+<aside class="panel side">
+<h3>Оперативный штаб</h3><div class="menu">
+<button onclick="showModal('inventory')">🎒 Инвентарь</button>
+<button onclick="showModal('warehouse')">📦 Склад</button>
+<button onclick="showModal('market')">🛒 Чёрный рынок</button>
+<button onclick="showModal('missions')">📜 Задания</button>
+<button onclick="showModal('upgrades')">🔧 Улучшение оружия</button>
+<button onclick="showModal('stats')">📊 Статистика</button>
+<button onclick="showModal('clan')">☠ Клан</button>
+</div>
+<h3 style="margin-top:auto">Рейд</h3>
+<div class="panel" style="padding:10px"><small>Режим</small><b>Туманный порт</b><br><small>Сложность: ★★★</small></div>
+<button class="primary" onclick="startRaid()">▶ НАЧАТЬ РЕЙД</button>
+</aside>
+<section class="panel hero">
+<div class="soldier"><div class="head"></div><div class="body"></div><div class="legs"><div class="leg"></div><div class="leg"></div></div><div class="gun"></div></div>
+<div class="heroContent"><h1>ТУМАННЫЙ ПОРТ</h1><p>Добудь ценный груз, избегай патрулей и успей добраться до точки эвакуации. В рейде ты рискуешь всем снаряжением.</p>
+<div class="loadout"><div class="slot"><small>Основное</small><b>MK-14 «Оса»</b></div><div class="slot"><small>Броня</small><b>Тактический жилет IV</b></div><div class="slot"><small>Рюкзак</small><b>Штурмовой 30л</b></div><div class="slot"><small>Боеприпасы</small><b>7.62 мм × 120</b></div><div class="slot"><small>Аптечки</small><b>2 × Медпакет</b></div><div class="slot"><small>Стоимость входа</small><b class="gold">30 000 ₽</b></div></div></div>
+</section>
+<aside class="panel inv rightPanel"><h3>Быстрый инвентарь</h3><div id="quickInv" class="grid"></div><h3 style="margin-top:15px">Последний рейд</h3><div id="lastRaid">Нет данных</div></aside>
+</section>
+
+<section id="raid" class="hidden">
+<canvas id="game" class="raidCanvas"></canvas>
+<div class="hud">
+<div class="hudTop"><div class="hudBox hp">Здоровье <b id="hpText">100</b><div class="bar"><i id="hpbar"></i></div><small id="status">В рейде</small></div><div class="hudBox ammo"><span id="ammo">30</span> / <span id="reserve">120</span></div><div class="mini" id="minimap"></div></div>
+<div class="cross">＋</div><div id="eventlog" class="eventlog"></div>
+<div id="hint" class="hint">▲▼◀▶ — движение · FIRE — стрелять · E — подобрать/эвакуироваться · R — перезарядка</div>
+<div class="controls">
+  <div class="movePad">
+    <button class="moveBtn up" data-key="w" aria-label="Вверх">▲</button>
+    <div class="moveRow"><button class="moveBtn left" data-key="a" aria-label="Влево">◀</button><button class="moveBtn down" data-key="s" aria-label="Вниз">▼</button><button class="moveBtn right" data-key="d" aria-label="Вправо">▶</button></div>
+  </div>
+  <div class="actions"><button onclick="reload()">R</button><button onclick="interact()">E</button><button class="fire" onpointerdown="shoot()">FIRE</button></div>
+</div>
+</div></section>
+</main>
+<div id="modal" class="hidden"><div class="modalBox"><div class="modalHead"><h2 id="modalTitle"></h2><button onclick="closeModal()">✕</button></div><div id="modalBody"></div></div></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const state={money:125000,xp:0,level:1,hp:100,ammo:30,reserve:120,raid:false,loot:[],kills:0,extracted:0,stats:{raids:0,kills:0,extracts:0},weapon:{name:'MK-14 «Оса»',damage:28,mag:30,price:75000,level:1},inventory:[
+{name:'MK-14 «Оса»',icon:'🔫',q:1,r:'e'},{name:'Броня IV',icon:'🦺',q:1,r:'r'},{name:'Рюкзак 30л',icon:'🎒',q:1,r:'e'},
+{name:'7.62 мм',icon:'🟫',q:120},{name:'Аптечка',icon:'🩹',q:2},{name:'Граната',icon:'💣',q:2},{name:'Ключ-карта',icon:'🪪',q:1,r:'l'}
+]};
+let keys={}, last=performance.now(), fireCooldown=0;
+let player={x:700,y:470,a:0,speed:180}; let bullets=[], enemies=[], pickups=[], particles=[], obstacles=[];
+window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.key.toLowerCase()==='e')interact();if(e.key.toLowerCase()==='r')reload();});
+window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+function save(){localStorage.setItem('metroExtractionSave',JSON.stringify(state));}
+function load(){try{Object.assign(state,JSON.parse(localStorage.getItem('metroExtractionSave'))||{})}catch(e){}}
+load(); renderQuick(); updateTop();
+
+function updateTop(){$('money').textContent=state.money.toLocaleString('ru-RU');$('xp').textContent=state.xp;$('level').textContent=state.level}
+function addLog(t){let d=document.createElement('div');d.textContent=t;$('eventlog').prepend(d);setTimeout(()=>d.remove(),8000)}
+function renderQuick(){ $('quickInv').innerHTML=state.inventory.slice(0,8).map(i=>`<div class="item ${i.r||''}"><div class="icon">${i.icon}</div><b>${i.name}</b><small>Предмет</small><span class="qty">×${i.q}</span></div>`).join('')}
+function showModal(type){
+const titles={inventory:'Инвентарь',warehouse:'Склад',market:'Чёрный рынок',missions:'Задания',upgrades:'Улучшение оружия',stats:'Статистика',clan:'Клан'};$('modalTitle').textContent=titles[type];
+let b='';
+if(type==='inventory'||type==='warehouse') b=`<div class="grid">${state.inventory.concat([{name:'Пусто',icon:'⬛',q:''},{name:'Пусто',icon:'⬛',q:''},{name:'Пусто',icon:'⬛',q:''}]).map(i=>`<div class="item ${i.r||''}"><div class="icon">${i.icon}</div><b>${i.name}</b><small>Снаряжение</small><span class="qty">${i.q?'×'+i.q:''}</span></div>`).join('')}</div>`;
+if(type==='market') b=`<p>Рынок обновляется каждые 30 минут.</p><div class="marketGrid">${[
+['🛡','Броня V класса',180000],['🎒','Рюкзак 45л',95000],['🔭','Оптика 6×',65000],['💊','Военный медпакет',22000],['🔑','Ключ от склада',75000],['💣','Осколочная граната',12000]
+].map(x=>`<div class="marketCard"><div style="font-size:30px">${x[0]}</div><b>${x[1]}</b><small>${x[2].toLocaleString()} ₽</small><br><button onclick="buy('${x[1]}',${x[2]})">Купить</button></div>`).join('')}</div>`;
+if(type==='missions') b=`<div class="panel" style="padding:12px;margin-bottom:8px">🎯 <b>Первый шаг</b><p>Эвакуируйся из рейда 3 раза. Прогресс: ${state.stats.extracts}/3</p><small>Награда: 50 000 ₽ + 500 XP</small></div><div class="panel" style="padding:12px">☠ <b>Охотник</b><p>Убей 15 противников. Прогресс: ${state.stats.kills}/15</p><small>Награда: 30 000 ₽</small></div>`;
+if(type==='upgrades') b=`<div class="panel" style="padding:14px"><h3>${state.weapon.name}</h3><p>Урон: <b>${state.weapon.damage}</b> · Магазин: ${state.weapon.mag}</p><p>Уровень улучшения: ${state.weapon.level}</p><button class="primary" onclick="upgradeWeapon()">УЛУЧШИТЬ — ${50000*state.weapon.level.toLocaleString()} ₽</button></div>`;
+if(type==='stats') b=`<div class="grid"><div class="item"><b>${state.stats.raids}</b><small>Рейдов</small></div><div class="item"><b>${state.stats.extracts}</b><small>Эвакуаций</small></div><div class="item"><b>${state.stats.kills}</b><small>Убийств</small></div><div class="item"><b>${state.stats.extracts?((state.stats.extracts/state.stats.raids)*100).toFixed(0):0}%</b><small>Успех</small></div></div>`;
+if(type==='clan') b=`<div class="panel" style="padding:14px"><h2>☠ METRO KINGS</h2><p>Уровень 6 · 32/50 участников</p><p>Рейтинг: 1520</p><button onclick="alert('В прототипе заявки отправляются локально.')">Вступить в отряд</button></div>`;
+$('modalBody').innerHTML=b;$('modal').classList.remove('hidden');
+}
+function closeModal(){$('modal').classList.add('hidden')}
+function buy(name,cost){if(state.money<cost)return alert('Недостаточно рублей');state.money-=cost;state.inventory.push({name,icon:'📦',q:1,r:'e'});updateTop();renderQuick();save();showModal('market')}
+function upgradeWeapon(){let cost=50000*state.weapon.level;if(state.money<cost)return alert('Недостаточно рублей');state.money-=cost;state.weapon.level++;state.weapon.damage+=7;updateTop();save();showModal('upgrades')}
+function startRaid(){
+if(state.money<30000)return alert('Нужно 30 000 ₽ для входа');
+state.money-=30000;state.raid=true;state.stats.raids++;state.hp=100;state.ammo=state.weapon.mag;state.reserve=120;state.loot=[];player={x:700,y:470,a:0,speed:180};bullets=[];enemies=[];pickups=[];particles=[];makeWorld();$('lobby').classList.add('hidden');$('raid').classList.remove('hidden');$('hint').classList.remove('hidden');updateTop();save();addLog('Рейд начат. Найди ценный лут и точку эвакуации.');setTimeout(()=>$('hint').classList.add('hidden'),5000);requestAnimationFrame(loop);
+}
+function makeWorld(){
+obstacles=[]; for(let i=0;i<18;i++){let x=100+(i*173)%1150,y=110+(i*97)%620;obstacles.push({x,y,w:70+(i%3)*30,h:45+(i%2)*35});}
+enemies=[];for(let i=0;i<10;i++)enemies.push({x:100+Math.random()*1200,y:130+Math.random()*650,hp:70,cd:Math.random()*2,alive:true});
+pickups=[
+{x:250,y:210,name:'Военная оптика',value:42000,icon:'🔭'},{x:1040,y:240,name:'Золотой слиток',value:90000,icon:'🪙'},
+{x:470,y:680,name:'Медпакет',value:18000,icon:'🩹'},{x:880,y:560,name:'Ключ от сейфа',value:65000,icon:'🔑'},
+{x:1200,y:680,name:'Электроника',value:33000,icon:'💾'}];
+}
+function shoot(){if(!state.raid||fireCooldown>0)return;if(state.ammo<=0){addLog('Пустой магазин! Нажми R.');return}state.ammo--;fireCooldown=.16;let ang=player.a;bullets.push({x:player.x+Math.cos(ang)*22,y:player.y+Math.sin(ang)*22,vx:Math.cos(ang)*720,vy:Math.sin(ang)*720,life:1});updateHUD()}
+function reload(){if(!state.raid||state.ammo>=state.weapon.mag||state.reserve<=0)return;let n=Math.min(state.weapon.mag-state.ammo,state.reserve);state.ammo+=n;state.reserve-=n;addLog('Перезарядка завершена.');updateHUD()}
+function interact(){
+if(!state.raid)return;
+let near=pickups.find(p=>Math.hypot(p.x-player.x,p.y-player.y)<55);
+if(near){state.loot.push(near);pickups=pickups.filter(p=>p!==near);addLog(`Подобрано: ${near.name} +${near.value.toLocaleString()} ₽ ценности`);return}
+if(Math.hypot(player.x-1330,player.y-720)<100){extract();return}
+addLog('Здесь нечего подобрать.');
+}
+function extract(){
+let value=state.loot.reduce((s,x)=>s+x.value,0);state.money+=value;state.xp+=Math.max(100,Math.floor(value/1000));state.stats.extracts++;state.extracted=value;state.raid=false;save();updateTop();renderQuick();$('raid').classList.add('hidden');$('lobby').classList.remove('hidden');$('lastRaid').innerHTML=`<b>Эвакуация успешна</b><br>Добыча: <span class="gold">${value.toLocaleString()} ₽</span><br>Убийств: ${state.kills}`;state.kills=0;if(state.xp>=state.level*1000){state.level++;addLog('Новый уровень!')}alert(`Эвакуация успешна!\nДобыча: ${value.toLocaleString()} ₽`);
+}
+function damage(n){state.hp=Math.max(0,state.hp-n);if(state.hp<=0)die();updateHUD()}
+function die(){state.raid=false;let lost=Math.round(state.loot.reduce((s,x)=>s+x.value,0)*.7);state.loot=[];save();$('raid').classList.add('hidden');$('lobby').classList.remove('hidden');$('lastRaid').innerHTML=`<b style="color:var(--red)">Операция провалена</b><br>Потеряно потенциальной добычи: ${lost.toLocaleString()} ₽`;alert('Ты погиб. Экипировка рейда потеряна.')}
+
+document.querySelectorAll('.moveBtn').forEach(btn=>{
+  const key=btn.dataset.key;
+  const on=ev=>{ev.preventDefault();keys[key]=true;btn.classList.add('active')};
+  const off=ev=>{ev.preventDefault();keys[key]=false;btn.classList.remove('active')};
+  btn.addEventListener('pointerdown',on);
+  btn.addEventListener('pointerup',off);
+  btn.addEventListener('pointercancel',off);
+  btn.addEventListener('pointerleave',off);
+});
+
+function updateHUD(){$('hpText').textContent=state.hp;$('hpbar').style.width=state.hp+'%';$('ammo').textContent=state.ammo;$('reserve').textContent=state.reserve}
+function circleRect(px,py,r,o){let cx=Math.max(o.x,Math.min(px,o.x+o.w)),cy=Math.max(o.y,Math.min(py,o.y+o.h));return Math.hypot(px-cx,py-cy)<r}
+
+window.addEventListener('pointermove',e=>{
+  if(!state.raid || e.pointerType==='touch') return;
+  const c=$('game').getBoundingClientRect();
+  const wx=player.x + (e.clientX-c.left-c.width/2);
+  const wy=player.y + (e.clientY-c.top-c.height/2);
+  player.a=Math.atan2(wy-player.y,wx-player.x);
+});
+window.addEventListener('pointerdown',e=>{
+  if(state.raid && e.pointerType==='mouse' && e.button===0) shoot();
+});
+
+function update(dt){
+if(!state.raid)return;fireCooldown=Math.max(0,fireCooldown-dt);
+let dx=(keys.d?1:0)-(keys.a?1:0),dy=(keys.s?1:0)-(keys.w?1:0);let len=Math.hypot(dx,dy)||1;dx/=len;dy/=len;
+let nx=player.x+dx*player.speed*dt,ny=player.y+dy*player.speed*dt;if(nx>25&&nx<1375&&!obstacles.some(o=>circleRect(nx,player.y,18,o)))player.x=nx;if(ny>25&&ny<775&&!obstacles.some(o=>circleRect(player.x,ny,18,o)))player.y=ny;
+let nearest=enemies.filter(e=>e.alive).sort((a,b)=>Math.hypot(a.x-player.x,a.y-player.y)-Math.hypot(b.x-player.x,b.y-player.y))[0];if(nearest)player.a=Math.atan2(nearest.y-player.y,nearest.x-player.x);
+for(const b of bullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(const e of enemies)if(e.alive&&Math.hypot(e.x-b.x,e.y-b.y)<20){e.hp-=state.weapon.damage;if(e.hp<=0){e.alive=false;state.stats.kills++;state.kills++;let val=5000+Math.floor(Math.random()*30000);pickups.push({x:e.x,y:e.y,name:'Добыча противника',value:val,icon:'📦'});addLog(`Противник устранён. Добыча ≈ ${val.toLocaleString()} ₽`)}b.life=0}}
+bullets=bullets.filter(b=>b.life>0&&b.x>0&&b.x<1400&&b.y>0&&b.y<800);
+for(const e of enemies)if(e.alive){e.cd-=dt;let d=Math.hypot(player.x-e.x,player.y-e.y);if(d<500){e.x+=(player.x-e.x)/Math.max(d,1)*25*dt;e.y+=(player.y-e.y)/Math.max(d,1)*25*dt;if(e.cd<=0&&d<360){damage(5+Math.floor(Math.random()*7));e.cd=1.2+Math.random()*1.5}}}
+updateHUD();
+}
+function draw(){
+const c=$('game'),ctx=c.getContext('2d'),dpr=devicePixelRatio||1,w=innerWidth,h=innerHeight;c.width=w*dpr;c.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+ctx.fillStyle='#111914';ctx.fillRect(0,0,w,h);let ox=w/2-player.x,oy=h/2-player.y;
+ctx.save();ctx.translate(ox,oy);
+ctx.fillStyle='#192119';ctx.fillRect(0,0,1400,800);
+ctx.strokeStyle='#252e25';ctx.lineWidth=2;for(let x=0;x<1400;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,800);ctx.stroke()}for(let y=0;y<800;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(1400,y);ctx.stroke()}
+ctx.fillStyle='#6c5736';ctx.fillRect(1290,680,100,80);ctx.fillStyle='#d3bb7c';ctx.font='bold 12px Arial';ctx.fillText('ЭВАКУАЦИЯ',1295,675);
+for(const o of obstacles){ctx.fillStyle='#2c342c';ctx.fillRect(o.x,o.y,o.w,o.h);ctx.strokeStyle='#596057';ctx.strokeRect(o.x,o.y,o.w,o.h)}
+for(const p of pickups){ctx.fillStyle='#d2a74f';ctx.beginPath();ctx.arc(p.x,p.y,10,0,Math.PI*2);ctx.fill();ctx.font='18px Arial';ctx.fillText(p.icon,p.x-9,p.y-14)}
+for(const e of enemies)if(e.alive){ctx.fillStyle='#8d3934';ctx.beginPath();ctx.arc(e.x,e.y,15,0,Math.PI*2);ctx.fill();ctx.fillStyle='#222';ctx.fillRect(e.x-12,e.y-23,24,4);ctx.fillStyle='#d55b4e';ctx.fillRect(e.x-12,e.y-23,24*(e.hp/70),4)}
+for(const b of bullets){ctx.fillStyle='#ffe8a4';ctx.beginPath();ctx.arc(b.x,b.y,3,0,Math.PI*2);ctx.fill()}
+ctx.fillStyle='#6e8c72';ctx.beginPath();ctx.arc(player.x,player.y,18,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#d9e2d4';ctx.stroke();ctx.strokeStyle='#ddd';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(player.x,player.y);ctx.lineTo(player.x+Math.cos(player.a)*30,player.y+Math.sin(player.a)*30);ctx.stroke();
+ctx.restore();
+let mm=$('minimap');mm.innerHTML=`<div style="position:absolute;left:${player.x/1400*100}%;top:${player.y/800*100}%;width:7px;height:7px;background:#fff;border-radius:50%"></div><div style="position:absolute;left:92%;top:86%;width:8px;height:8px;background:#d5a74e;border-radius:50%"></div>`;
+}
+function loop(t){let dt=Math.min(.033,(t-last)/1000);last=t;update(dt);draw();if(state.raid)requestAnimationFrame(loop)}
+document.querySelector('.fire').addEventListener('pointerdown',e=>e.preventDefault());
+</script>
+</body></html>
