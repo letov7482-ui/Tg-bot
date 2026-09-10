@@ -2,114 +2,290 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Крестики-нолики на 4 игрока</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>⚡ Крестики-нолики 4X — PRO</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-1: #0f0c29;
+    --bg-2: #302b63;
+    --bg-3: #24243e;
+    --card: rgba(255, 255, 255, 0.06);
+    --card-hover: rgba(255, 255, 255, 0.12);
+    --border: rgba(255, 255, 255, 0.12);
+    --text: #ffffff;
+    --text-dim: #a0a0b8;
+    --shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    --p1: #ff4d6d;
+    --p2: #4d9bff;
+    --p3: #4dff88;
+    --p4: #ffd24d;
+  }
+
+  body.light {
+    --bg-1: #e8eaf6;
+    --bg-2: #c5cae9;
+    --bg-3: #f5f5f5;
+    --card: rgba(255, 255, 255, 0.7);
+    --card-hover: rgba(255, 255, 255, 0.9);
+    --border: rgba(0, 0, 0, 0.12);
+    --text: #1a1a2e;
+    --text-dim: #555577;
+    --shadow: 0 20px 60px rgba(100, 100, 150, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
   body {
-    font-family: 'Segoe UI', Arial, sans-serif;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%);
-    color: #fff;
-    padding: 20px;
+    background: linear-gradient(135deg, var(--bg-1), var(--bg-2), var(--bg-3));
+    background-size: 300% 300%;
+    animation: bgShift 20s ease infinite;
+    color: var(--text);
+    padding: 16px;
+    overflow-x: hidden;
+    transition: color 0.4s;
+  }
+
+  @keyframes bgShift {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
   }
 
   .container {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    max-width: 600px;
+    background: var(--card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+    max-width: 640px;
     width: 100%;
-    text-align: center;
+    position: relative;
+    animation: fadeIn 0.6s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── ШАПКА ─── */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
   }
 
   h1 {
-    font-size: 26px;
-    margin-bottom: 8px;
-    background: linear-gradient(90deg, #ff4d6d, #4d9bff, #4dff88, #ffd24d);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, var(--p1), var(--p2), var(--p3), var(--p4), var(--p1));
+    background-size: 300% 100%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: textFlow 6s linear infinite;
+    flex: 1;
   }
+
+  @keyframes textFlow {
+    to { background-position: 300% 0; }
+  }
+
+  .icon-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    font-size: 17px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .icon-btn:hover {
+    background: var(--card-hover);
+    transform: translateY(-2px) scale(1.05);
+  }
+
+  .icon-btn:active { transform: scale(0.95); }
 
   .subtitle {
-    font-size: 13px;
-    color: #aaa;
-    margin-bottom: 20px;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 18px;
+    letter-spacing: 0.3px;
   }
 
-  /* Список игроков */
+  /* ─── ИГРОКИ ─── */
   .players {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
   }
 
   .player {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 14px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.05);
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: var(--card);
     border: 2px solid transparent;
-    transition: all 0.3s ease;
-    font-size: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 13px;
     font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .player::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
   }
 
   .player.active {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px currentColor;
+    border-color: currentColor;
+    box-shadow: 0 0 20px currentColor, inset 0 0 20px rgba(255, 255, 255, 0.05);
+    transform: scale(1.03);
+  }
+
+  .player.active::before { opacity: 0.08; }
+
+  .player.winner {
+    animation: winnerPulse 0.8s infinite alternate;
     border-color: currentColor;
   }
 
-  .player.winner {
-    animation: pulse 0.8s infinite alternate;
-  }
-
-  @keyframes pulse {
-    from { box-shadow: 0 0 10px currentColor; }
-    to   { box-shadow: 0 0 30px currentColor, 0 0 50px currentColor; }
+  @keyframes winnerPulse {
+    from { box-shadow: 0 0 15px currentColor; transform: scale(1.03); }
+    to   { box-shadow: 0 0 40px currentColor, 0 0 60px currentColor; transform: scale(1.08); }
   }
 
   .dot {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     flex-shrink: 0;
+    background: currentColor;
     box-shadow: 0 0 10px currentColor;
+    transition: transform 0.3s;
   }
 
-  .p1 { color: #ff4d6d; } .p1 .dot { background: #ff4d6d; }
-  .p2 { color: #4d9bff; } .p2 .dot { background: #4d9bff; }
-  .p3 { color: #4dff88; } .p3 .dot { background: #4dff88; }
-  .p4 { color: #ffd24d; } .p4 .dot { background: #ffd24d; }
+  .player.active .dot {
+    animation: dotPulse 1s infinite;
+  }
 
-  /* Поле */
+  @keyframes dotPulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.25); }
+  }
+
+  .p1 { color: var(--p1); }
+  .p2 { color: var(--p2); }
+  .p3 { color: var(--p3); }
+  .p4 { color: var(--p4); }
+
+  .player-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .player-name {
+    color: var(--text);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .player-score {
+    font-size: 10px;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+
+  .player-emoji { font-size: 15px; flex-shrink: 0; }
+
+  /* ─── СТАТУС ─── */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 16px;
+    min-height: 52px;
+  }
+
+  .status {
+    font-size: 14px;
+    font-weight: 700;
+    flex: 1;
+  }
+
+  .timer {
+    font-size: 14px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    min-width: 44px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .timer.warn {
+    color: #ff4444;
+    animation: timerPulse 0.6s infinite;
+  }
+
+  @keyframes timerPulse {
+    50% { transform: scale(1.1); }
+  }
+
+  /* ─── ПОЛЕ ─── */
   .board {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin: 0 auto 20px;
-    max-width: 420px;
+    gap: 6px;
+    margin: 0 auto 16px;
+    max-width: 460px;
+    aspect-ratio: 1;
   }
 
   .cell {
-    aspect-ratio: 1;
-    background: rgba(255, 255, 255, 0.06);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: var(--card);
+    border: 2px solid var(--border);
     border-radius: 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -117,53 +293,77 @@
     overflow: hidden;
   }
 
-  .cell:hover:not(.taken) {
-    background: rgba(255, 255, 255, 0.12);
-    transform: translateY(-2px);
+  .cell::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.4), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
   }
+
+  .cell:hover:not(.taken) {
+    background: var(--card-hover);
+    transform: translateY(-3px) scale(1.02);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .cell:hover:not(.taken)::after { opacity: 0.3; }
+
+  .cell:active:not(.taken) { transform: scale(0.95); }
 
   .cell.taken { cursor: not-allowed; }
 
+  .cell.hint { animation: hintCell 0.6s infinite alternate; }
+
+  @keyframes hintCell {
+    from { border-color: var(--border); }
+    to   { border-color: rgba(255, 255, 255, 0.6); }
+  }
+
   .mark {
-    width: 60%;
-    height: 60%;
+    width: 62%;
+    height: 62%;
     border-radius: 50%;
-    animation: pop 0.3s ease;
+    animation: pop 0.35s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    position: relative;
+    z-index: 1;
   }
 
   @keyframes pop {
-    0%   { transform: scale(0); opacity: 0; }
-    70%  { transform: scale(1.2); }
-    100% { transform: scale(1); opacity: 1; }
+    0%   { transform: scale(0) rotate(-180deg); opacity: 0; }
+    70%  { transform: scale(1.15) rotate(10deg); }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
   }
 
-  .cell .mark.m1 { background: #ff4d6d; box-shadow: 0 0 20px #ff4d6d; }
-  .cell .mark.m2 { background: #4d9bff; box-shadow: 0 0 20px #4d9bff; }
-  .cell .mark.m3 { background: #4dff88; box-shadow: 0 0 20px #4dff88; }
-  .cell .mark.m4 { background: #ffd24d; box-shadow: 0 0 20px #ffd24d; }
+  .mark.m1 { background: var(--p1); box-shadow: 0 0 20px var(--p1), inset -4px -4px 8px rgba(0,0,0,0.3); }
+  .mark.m2 { background: var(--p2); box-shadow: 0 0 20px var(--p2), inset -4px -4px 8px rgba(0,0,0,0.3); }
+  .mark.m3 { background: var(--p3); box-shadow: 0 0 20px var(--p3), inset -4px -4px 8px rgba(0,0,0,0.3); }
+  .mark.m4 { background: var(--p4); box-shadow: 0 0 20px var(--p4), inset -4px -4px 8px rgba(0,0,0,0.3); }
 
   .cell.win {
-    background: rgba(255, 255, 255, 0.2);
-    animation: winFlash 0.6s infinite alternate;
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.8);
+    animation: winFlash 0.5s infinite alternate;
   }
 
   @keyframes winFlash {
-    from { transform: scale(1); }
-    to   { transform: scale(1.08); }
+    from { transform: scale(1); box-shadow: 0 0 10px currentColor; }
+    to   { transform: scale(1.08); box-shadow: 0 0 30px currentColor; }
   }
 
-  /* Статус */
-  .status {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 16px;
-    min-height: 24px;
+  /* ─── КНОПКИ ─── */
+  .controls {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
-  /* Кнопки */
   .btn {
-    padding: 12px 28px;
-    font-size: 15px;
+    padding: 11px 20px;
+    font-size: 13px;
     font-weight: 700;
     border: none;
     border-radius: 12px;
@@ -171,89 +371,331 @@
     background: linear-gradient(135deg, #6a4dff, #4d9bff);
     color: #fff;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 20px rgba(106, 77, 255, 0.4);
+    box-shadow: 0 4px 20px rgba(106, 77, 255, 0.35);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
   }
 
-  .btn:hover {
+  .btn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(106, 77, 255, 0.6);
+    box-shadow: 0 6px 25px rgba(106, 77, 255, 0.55);
   }
 
-  .btn:active { transform: translateY(0); }
+  .btn:active:not(:disabled) { transform: translateY(0) scale(0.97); }
 
-  /* Оверлей */
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .btn.secondary {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    box-shadow: none;
+  }
+
+  .btn.secondary:hover:not(:disabled) {
+    background: var(--card-hover);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+
+  /* ─── ОВЕРЛЕЙ ─── */
   .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: none;
     align-items: center;
     justify-content: center;
     z-index: 100;
     padding: 20px;
+    animation: fadeIn 0.3s;
   }
 
   .overlay.show { display: flex; }
 
   .overlay-content {
-    background: #1e1e2f;
-    padding: 40px;
-    border-radius: 20px;
+    background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+    padding: 36px 30px;
+    border-radius: 24px;
     text-align: center;
     max-width: 400px;
-    animation: pop 0.4s ease;
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    animation: overlayPop 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    position: relative;
+    overflow: hidden;
+  }
+
+  @keyframes overlayPop {
+    0%   { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+
+  .overlay-emoji {
+    font-size: 64px;
+    margin-bottom: 12px;
+    display: block;
+    animation: bounceEmoji 1s infinite;
+  }
+
+  @keyframes bounceEmoji {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
   }
 
   .overlay-content h2 {
-    font-size: 28px;
-    margin-bottom: 12px;
+    font-size: 26px;
+    margin-bottom: 8px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #fff;
   }
 
   .overlay-content p {
-    color: #aaa;
+    color: #ccc;
     margin-bottom: 24px;
+    font-size: 14px;
   }
 
-  @media (max-width: 500px) {
-    .container { padding: 20px; }
-    h1 { font-size: 20px; }
-    .players { grid-template-columns: 1fr; }
-    .player { font-size: 13px; padding: 8px 12px; }
+  .overlay-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
   }
+
+  /* ─── МОДАЛКА НАСТРОЕК ─── */
+  .settings-content {
+    background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+    padding: 28px;
+    border-radius: 24px;
+    max-width: 440px;
+    width: 100%;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    animation: overlayPop 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  }
+
+  .settings-content h2 {
+    color: #fff;
+    font-size: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .setting-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .setting-row label {
+    flex: 1;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .setting-row input[type="text"] {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: #fff;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    min-width: 0;
+  }
+
+  .setting-row input[type="text"]:focus {
+    border-color: rgba(255,255,255,0.4);
+  }
+
+  .color-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px currentColor;
+    background: currentColor;
+  }
+
+  .settings-content .btn { width: 100%; justify-content: center; }
+
+  /* ─── КОНФЕТТИ ─── */
+  .confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    z-index: 200;
+    border-radius: 2px;
+  }
+
+  /* ─── АДАПТИВ ─── */
+  @media (max-width: 500px) {
+    .container { padding: 18px; border-radius: 20px; }
+    h1 { font-size: 18px; }
+    .subtitle { font-size: 11px; }
+    .players { gap: 6px; }
+    .player { padding: 8px 10px; font-size: 12px; }
+    .player-name { font-size: 11px; }
+    .status-bar { padding: 10px 12px; min-height: 46px; }
+    .status { font-size: 12px; }
+    .timer { font-size: 12px; padding: 3px 8px; }
+    .btn { padding: 9px 14px; font-size: 12px; }
+    .board { gap: 4px; }
+    .overlay-emoji { font-size: 48px; }
+    .overlay-content h2 { font-size: 22px; }
+  }
+
+  /* ─── ХОД ОТМЕНЁН ─── */
+  .cell.undoing {
+    animation: undoing 0.4s ease;
+  }
+
+  @keyframes undoing {
+    0%   { transform: scale(1); opacity: 1; }
+    50%  { transform: scale(1.3); opacity: 0.5; background: rgba(255,80,80,0.3); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ─── ПРОЧЕЕ ─── */
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>Крестики-нолики на 4 игрока</h1>
-  <p class="subtitle">Поле 5×5 · Собери 4 в ряд по горизонтали, вертикали или диагонали</p>
+  <div class="top-bar">
+    <h1>⚡ Крестики-нолики 4X</h1>
+    <button class="icon-btn" id="themeBtn" title="Тема">🌙</button>
+    <button class="icon-btn" id="soundBtn" title="Звук">🔊</button>
+    <button class="icon-btn" id="settingsBtn" title="Настройки">⚙️</button>
+  </div>
+  <p class="subtitle">Поле 5×5 · Собери 4 в ряд · 4 игрока</p>
 
-  <div class="players">
-    <div class="player p1" id="player1"><div class="dot"></div>Красный</div>
-    <div class="player p2" id="player2"><div class="dot"></div>Синий</div>
-    <div class="player p3" id="player3"><div class="dot"></div>Зелёный</div>
-    <div class="player p4" id="player4"><div class="dot"></div>Жёлтый</div>
+  <div class="players" id="playersBox">
+    <div class="player p1" data-player="1">
+      <div class="dot"></div>
+      <div class="player-info">
+        <span class="player-name">Красный</span>
+        <span class="player-score">Побед: 0</span>
+      </div>
+      <span class="player-emoji">🔴</span>
+    </div>
+    <div class="player p2" data-player="2">
+      <div class="dot"></div>
+      <div class="player-info">
+        <span class="player-name">Синий</span>
+        <span class="player-score">Побед: 0</span>
+      </div>
+      <span class="player-emoji">🔵</span>
+    </div>
+    <div class="player p3" data-player="3">
+      <div class="dot"></div>
+      <div class="player-info">
+        <span class="player-name">Зелёный</span>
+        <span class="player-score">Побед: 0</span>
+      </div>
+      <span class="player-emoji">🟢</span>
+    </div>
+    <div class="player p4" data-player="4">
+      <div class="dot"></div>
+      <div class="player-info">
+        <span class="player-name">Жёлтый</span>
+        <span class="player-score">Побед: 0</span>
+      </div>
+      <span class="player-emoji">🟡</span>
+    </div>
   </div>
 
-  <div class="status" id="status">Ход: 🔴 Красный</div>
+  <div class="status-bar">
+    <div class="status" id="status">Ход: 🔴 Красный</div>
+    <div class="timer" id="timer">30</div>
+  </div>
 
   <div class="board" id="board"></div>
 
-  <button class="btn" onclick="resetGame()">🔄 Новая игра</button>
+  <div class="controls">
+    <button class="btn secondary" id="undoBtn" title="Отменить последний ход">↩️ Отменить</button>
+    <button class="btn" id="resetBtn">🔄 Новая игра</button>
+    <button class="btn secondary" id="resetScoreBtn" title="Сбросить счёт">📊 Сброс счёта</button>
+  </div>
 </div>
 
+<!-- ОВЕРЛЕЙ РЕЗУЛЬТАТА -->
 <div class="overlay" id="overlay">
   <div class="overlay-content">
+    <span class="overlay-emoji" id="overlayEmoji">🏆</span>
     <h2 id="overlayTitle">Победа!</h2>
     <p id="overlayText"></p>
-    <button class="btn" onclick="resetGame()">🔄 Играть снова</button>
+    <div class="overlay-buttons">
+      <button class="btn" id="overlayPlayBtn">🔄 Играть снова</button>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛКА НАСТРОЕК -->
+<div class="overlay" id="settingsModal">
+  <div class="settings-content">
+    <h2>⚙️ Настройки</h2>
+
+    <div class="setting-row">
+      <span class="color-dot" style="color:#ff4d6d"></span>
+      <input type="text" id="name1" maxlength="12" placeholder="Красный">
+    </div>
+    <div class="setting-row">
+      <span class="color-dot" style="color:#4d9bff"></span>
+      <input type="text" id="name2" maxlength="12" placeholder="Синий">
+    </div>
+    <div class="setting-row">
+      <span class="color-dot" style="color:#4dff88"></span>
+      <input type="text" id="name3" maxlength="12" placeholder="Зелёный">
+    </div>
+    <div class="setting-row">
+      <span class="color-dot" style="color:#ffd24d"></span>
+      <input type="text" id="name4" maxlength="12" placeholder="Жёлтый">
+    </div>
+
+    <div class="setting-row">
+      <label>⏱️ Таймер (сек):</label>
+      <input type="text" id="timerInput" maxlength="3" placeholder="30" style="max-width:70px;text-align:center;">
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <button class="btn secondary" id="settingsCancel">Отмена</button>
+      <button class="btn" id="settingsSave">💾 Сохранить</button>
+    </div>
   </div>
 </div>
 
 <script>
+(() => {
+  'use strict';
+
+  /* ════════════════════════════════════
+     КОНСТАНТЫ И СОСТОЯНИЕ
+  ════════════════════════════════════ */
   const SIZE = 5;
   const WIN_LENGTH = 4;
+  const STORAGE_KEY = 'ttt4x_state_v1';
 
   const COLORS = {
     1: { name: 'Красный', hex: '#ff4d6d', emoji: '🔴' },
@@ -265,52 +707,128 @@
   let board = [];
   let currentPlayer = 1;
   let finished = false;
-  let boardEl;
-  let statusEl;
-  let overlayEl;
-  let overlayTitleEl;
-  let overlayTextEl;
+  let history = [];          // для отмены ходов
+  let scores = { 1: 0, 2: 0, 3: 0, 4: 0 };
+  let names = { 1: 'Красный', 2: 'Синий', 3: 'Зелёный', 4: 'Жёлтый' };
+  let timerDuration = 30;
+  let timerInterval = null;
+  let timerLeft = 30;
+  let soundOn = true;
+  let theme = 'dark';
+
+  // Ссылки на DOM
+  const $ = (id) => document.getElementById(id);
+  let boardEl, statusEl, timerEl, overlayEl, overlayEmojiEl, overlayTitleEl, overlayTextEl;
   let playerEls = {};
 
-  function initGame() {
-    boardEl = document.getElementById('board');
-    statusEl = document.getElementById('status');
-    overlayEl = document.getElementById('overlay');
-    overlayTitleEl = document.getElementById('overlayTitle');
-    overlayTextEl = document.getElementById('overlayText');
+  /* ════════════════════════════════════
+     ЗВУКИ (Web Audio API)
+  ════════════════════════════════════ */
+  let audioCtx = null;
 
-    playerEls = {
-      1: document.getElementById('player1'),
-      2: document.getElementById('player2'),
-      3: document.getElementById('player3'),
-      4: document.getElementById('player4'),
-    };
-
-    resetGame();
+  function initAudio() {
+    if (!audioCtx) {
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      } catch (e) { audioCtx = null; }
+    }
   }
 
-  function resetGame() {
-    board = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+  function playTone(freq, duration = 0.1, type = 'sine', volume = 0.15) {
+    if (!soundOn || !audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch (e) {}
+  }
+
+  const sounds = {
+    move:    () => playTone(520, 0.08, 'sine', 0.12),
+    undo:    () => playTone(220, 0.15, 'triangle', 0.1),
+    win:     () => { playTone(660, 0.15); setTimeout(() => playTone(880, 0.15), 120); setTimeout(() => playTone(1100, 0.3), 240); },
+    draw:    () => { playTone(330, 0.2, 'triangle'); setTimeout(() => playTone(280, 0.3, 'triangle'), 180); },
+    click:   () => playTone(400, 0.05, 'square', 0.05),
+    error:   () => playTone(150, 0.15, 'sawtooth', 0.08),
+    turnEnd: () => playTone(700, 0.06, 'sine', 0.08),
+  };
+
+  /* ════════════════════════════════════
+     СОХРАНЕНИЕ / ЗАГРУЗКА
+  ════════════════════════════════════ */
+  function saveState() {
+    try {
+      const state = {
+        scores,
+        names,
+        timerDuration,
+        soundOn,
+        theme,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {}
+  }
+
+  function loadState() {
+    try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const s = JSON.parse(raw);
+      if (s.scores) scores = s.scores;
+      if (s.names) names = s.names;
+      if (typeof s.timerDuration === 'number') timerDuration = s.timerDuration;
+      if (typeof s.soundOn === 'boolean') soundOn = s.soundOn;
+      if (s.theme) theme = s.theme;
+    } catch (e) {}
+  }
+
+  /* ════════════════════════════════════
+     ВСПОМОГАТЕЛЬНЫЕ
+  ════════════════════════════════════ */
+  function inBounds(r, c) {
+    return r >= 0 && r < SIZE && c >= 0 && c < SIZE;
+  }
+
+  function emptyBoard() {
+    return Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+  }
+
+  /* ════════════════════════════════════
+     ЛОГИКА ИГРЫ
+  ════════════════════════════════════ */
+  function resetGame(silent) {
+    board = emptyBoard();
     currentPlayer = 1;
     finished = false;
+    history = [];
 
+    stopTimer();
     overlayEl.classList.remove('show');
-    Object.values(playerEls).forEach(el => el.classList.remove('active', 'winner'));
+    document.querySelectorAll('.player').forEach(el => el.classList.remove('active', 'winner'));
 
     renderBoard();
+    updatePlayers();
     updateStatus();
+    startTimer();
+
+    if (!silent) sounds.click();
   }
 
   function renderBoard() {
     boardEl.innerHTML = '';
-
     for (let r = 0; r < SIZE; r++) {
       for (let c = 0; c < SIZE; c++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
         cell.dataset.row = r;
         cell.dataset.col = c;
-
         const val = board[r][c];
         if (val !== 0) {
           cell.classList.add('taken');
@@ -318,7 +836,6 @@
           mark.className = `mark m${val}`;
           cell.appendChild(mark);
         }
-
         cell.addEventListener('click', () => handleClick(r, c));
         boardEl.appendChild(cell);
       }
@@ -326,23 +843,32 @@
   }
 
   function handleClick(row, col) {
+    initAudio();
     if (finished) return;
-    if (board[row][col] !== 0) return;
+    if (board[row][col] !== 0) { sounds.error(); return; }
+
+    // Запись в историю для отмены
+    history.push({ row, col, player: currentPlayer });
 
     board[row][col] = currentPlayer;
-
     const cell = boardEl.querySelector(`[data-row="${row}"][data-col="${col}"]`);
     cell.classList.add('taken');
     const mark = document.createElement('div');
     mark.className = `mark m${currentPlayer}`;
     cell.appendChild(mark);
 
+    sounds.move();
+
     const winCells = checkWin(row, col, currentPlayer);
     if (winCells) {
       finished = true;
+      stopTimer();
+      scores[currentPlayer]++;
+      saveState();
       winCells.forEach(([r, c]) => {
-        const cellEl = boardEl.querySelector(`[data-row="${r}"][data-col="${c}"]`);
-        cellEl.classList.add('win');
+        const el = boardEl.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+        el.classList.add('win');
+        el.style.color = COLORS[currentPlayer].hex;
       });
       showWinner(currentPlayer);
       return;
@@ -350,86 +876,289 @@
 
     if (board.flat().every(v => v !== 0)) {
       finished = true;
+      stopTimer();
       showDraw();
       return;
     }
 
-    currentPlayer = currentPlayer % 4 + 1;
+    currentPlayer = (currentPlayer % 4) + 1;
     updateStatus();
+    updatePlayers();
+    startTimer();
+    sounds.turnEnd();
   }
 
   function checkWin(row, col, player) {
-    const directions = [
-      [0, 1],   // горизонталь
-      [1, 0],   // вертикаль
-      [1, 1],   // диагональ ↘
-      [1, -1],  // диагональ ↙
-    ];
-
-    for (const [dr, dc] of directions) {
+    const dirs = [[0, 1], [1, 0], [1, 1], [1, -1]];
+    for (const [dr, dc] of dirs) {
       const cells = [[row, col]];
-
-      // В одну сторону
       let r = row + dr, c = col + dc;
       while (inBounds(r, c) && board[r][c] === player) {
-        cells.push([r, c]);
-        r += dr; c += dc;
+        cells.push([r, c]); r += dr; c += dc;
       }
-
-      // В другую сторону
       r = row - dr; c = col - dc;
       while (inBounds(r, c) && board[r][c] === player) {
-        cells.push([r, c]);
-        r -= dr; c -= dc;
+        cells.push([r, c]); r -= dr; c -= dc;
       }
-
       if (cells.length >= WIN_LENGTH) return cells;
     }
-
     return null;
   }
 
-  function inBounds(r, c) {
-    return r >= 0 && r < SIZE && c >= 0 && c < SIZE;
+  function undoMove() {
+    initAudio();
+    if (!history.length || finished) { sounds.error(); return; }
+
+    const last = history.pop();
+    board[last.row][last.col] = 0;
+    currentPlayer = last.player;
+
+    const cell = boardEl.querySelector(`[data-row="${last.row}"][data-col="${last.col}"]`);
+    cell.classList.remove('taken');
+    cell.classList.add('undoing');
+    setTimeout(() => cell.classList.remove('undoing'), 400);
+    const mark = cell.querySelector('.mark');
+    if (mark) mark.remove();
+
+    // Убираем подсветку победы, если была
+    boardEl.querySelectorAll('.win').forEach(el => el.classList.remove('win'));
+
+    updateStatus();
+    updatePlayers();
+    startTimer();
+    sounds.undo();
   }
 
+  /* ════════════════════════════════════
+     СТАТУС И ИГРОКИ
+  ════════════════════════════════════ */
   function updateStatus() {
     const p = COLORS[currentPlayer];
-    statusEl.innerHTML = `Ход: ${p.emoji} <span style="color:${p.hex}">${p.name}</span>`;
+    statusEl.innerHTML = `Ход: ${p.emoji} <span style="color:${p.hex}">${escapeHtml(names[currentPlayer])}</span>`;
+  }
 
-    Object.entries(playerEls).forEach(([num, el]) => {
-      el.classList.toggle('active', Number(num) === currentPlayer);
+  function updatePlayers() {
+    document.querySelectorAll('.player').forEach(el => {
+      const num = Number(el.dataset.player);
+      el.classList.toggle('active', num === currentPlayer && !finished);
+      el.querySelector('.player-name').textContent = names[num];
+      el.querySelector('.player-score').textContent = `Побед: ${scores[num]}`;
     });
   }
 
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, ch => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[ch]));
+  }
+
+  /* ════════════════════════════════════
+     ТАЙМЕР
+  ════════════════════════════════════ */
+  function startTimer() {
+    stopTimer();
+    if (timerDuration <= 0 || finished) {
+      timerEl.textContent = '∞';
+      timerEl.classList.remove('warn');
+      return;
+    }
+    timerLeft = timerDuration;
+    updateTimerUI();
+    timerInterval = setInterval(() => {
+      timerLeft--;
+      updateTimerUI();
+      if (timerLeft <= 5 && timerLeft > 0) playTone(600, 0.05, 'square', 0.05);
+      if (timerLeft <= 0) {
+        stopTimer();
+        // Автопропуск хода
+        sounds.error();
+        currentPlayer = (currentPlayer % 4) + 1;
+        updateStatus();
+        updatePlayers();
+        startTimer();
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  }
+
+  function updateTimerUI() {
+    timerEl.textContent = timerLeft;
+    timerEl.classList.toggle('warn', timerLeft <= 5);
+  }
+
+  /* ════════════════════════════════════
+     ПОБЕДА / НИЧЬЯ
+  ════════════════════════════════════ */
   function showWinner(player) {
     const p = COLORS[player];
-    statusEl.innerHTML = `🏆 Победил ${p.emoji} <span style="color:${p.hex}">${p.name}</span>!`;
+    statusEl.innerHTML = `🏆 Победил ${p.emoji} <span style="color:${p.hex}">${escapeHtml(names[player])}</span>!`;
+    document.querySelectorAll('.player').forEach(el => el.classList.remove('active'));
+    const el = document.querySelector(`.player[data-player="${player}"]`);
+    if (el) el.classList.add('winner');
 
-    playerEls[player].classList.add('winner');
-    Object.values(playerEls).forEach(el => el.classList.remove('active'));
+    sounds.win();
+    launchConfetti(p.hex);
 
-    overlayTitleEl.textContent = '🏆 Победа!';
+    overlayEmojiEl.textContent = '🏆';
+    overlayTitleEl.textContent = 'Победа!';
     overlayTitleEl.style.color = p.hex;
-    overlayTextEl.textContent = `${p.emoji} ${p.name} собрал 4 в ряд!`;
+    overlayTextEl.textContent = `${p.emoji} ${names[player]} собрал 4 в ряд!`;
 
-    setTimeout(() => overlayEl.classList.add('show'), 600);
+    setTimeout(() => overlayEl.classList.add('show'), 700);
+    updatePlayers();
   }
 
   function showDraw() {
     statusEl.textContent = '🤝 Ничья!';
-    Object.values(playerEls).forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.player').forEach(el => el.classList.remove('active'));
+    sounds.draw();
 
-    overlayTitleEl.textContent = '🤝 Ничья!';
+    overlayEmojiEl.textContent = '🤝';
+    overlayTitleEl.textContent = 'Ничья!';
     overlayTitleEl.style.color = '#fff';
     overlayTextEl.textContent = 'Поле заполнено, победителя нет.';
 
-    setTimeout(() => overlayEl.classList.add('show'), 600);
+    setTimeout(() => overlayEl.classList.add('show'), 700);
   }
 
-  // Запуск
-  initGame();
-</script>
+  /* ════════════════════════════════════
+     КОНФЕТТИ
+  ════════════════════════════════════ */
+  function launchConfetti(color) {
+    const colors = [color, '#fff', '#ffd700', '#ff4d6d', '#4d9bff', '#4dff88'];
+    const count = 60;
+    for (let i = 0; i < count; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.top = '-20px';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.transform = `rotate(${Math.random() * 360}deg)`;
+      c.style.width = (6 + Math.random() * 8) + 'px';
+      c.style.height = (6 + Math.random() * 8) + 'px';
+      document.body.appendChild(c);
 
+      const duration = 1500 + Math.random() * 1500;
+      const xDrift = (Math.random() - 0.5) * 400;
+      c.animate([
+        { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+        { transform: `translate(${xDrift}px, ${window.innerHeight + 40}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+      ], {
+        duration,
+        easing: 'cubic-bezier(0.4, 0.1, 0.7, 1)',
+      }).onfinish = () => c.remove();
+    }
+  }
+
+  /* ════════════════════════════════════
+     ТЕМА / ЗВУК / НАСТРОЙКИ
+  ════════════════════════════════════ */
+  function applyTheme() {
+    document.body.classList.toggle('light', theme === 'light');
+    $('themeBtn').textContent = theme === 'light' ? '☀️' : '🌙';
+  }
+
+  function toggleTheme() {
+    theme = theme === 'light' ? 'dark' : 'light';
+    applyTheme();
+    saveState();
+    sounds.click();
+  }
+
+  function toggleSound() {
+    soundOn = !soundOn;
+    $('soundBtn').textContent = soundOn ? '🔊' : '🔇';
+    saveState();
+    if (soundOn) { initAudio(); sounds.click(); }
+  }
+
+  function openSettings() {
+    sounds.click();
+    for (let i = 1; i <= 4; i++) $('name' + i).value = names[i];
+    $('timerInput').value = timerDuration;
+    $('settingsModal').classList.add('show');
+  }
+
+  function closeSettings() {
+    $('settingsModal').classList.remove('show');
+  }
+
+  function saveSettings() {
+    for (let i = 1; i <= 4; i++) {
+      const v = $('name' + i).value.trim();
+      names[i] = v || COLORS[i].name;
+    }
+    let t = parseInt($('timerInput').value, 10);
+    if (isNaN(t) || t < 0) t = 30;
+    if (t > 999) t = 999;
+    timerDuration = t;
+
+    saveState();
+    updatePlayers();
+    updateStatus();
+    startTimer();
+    closeSettings();
+    sounds.click();
+  }
+
+  /* ════════════════════════════════════
+     ИНИЦИАЛИЗАЦИЯ
+  ════════════════════════════════════ */
+  function init() {
+    boardEl = $('board');
+    statusEl = $('status');
+    timerEl = $('timer');
+    overlayEl = $('overlay');
+    overlayEmojiEl = $('overlayEmoji');
+    overlayTitleEl = $('overlayTitle');
+    overlayTextEl = $('overlayText');
+
+    loadState();
+    applyTheme();
+    $('soundBtn').textContent = soundOn ? '🔊' : '🔇';
+
+    // Слушатели
+    $('resetBtn').addEventListener('click', () => resetGame());
+    $('overlayPlayBtn').addEventListener('click', () => resetGame());
+    $('undoBtn').addEventListener('click', undoMove);
+    $('resetScoreBtn').addEventListener('click', () => {
+      scores = { 1: 0, 2: 0, 3: 0, 4: 0 };
+      saveState();
+      updatePlayers();
+      sounds.click();
+    });
+    $('themeBtn').addEventListener('click', toggleTheme);
+    $('soundBtn').addEventListener('click', toggleSound);
+    $('settingsBtn').addEventListener('click', openSettings);
+    $('settingsCancel').addEventListener('click', closeSettings);
+    $('settingsSave').addEventListener('click', saveSettings);
+    $('settingsModal').addEventListener('click', e => {
+      if (e.target === $('settingsModal')) closeSettings();
+    });
+
+    // Горячие клавиши
+    document.addEventListener('keydown', e => {
+      if (e.key === 'r' || e.key === 'R') resetGame();
+      if (e.key === 'z' || e.key === 'Z') undoMove();
+      if (e.key === 'Escape') {
+        overlayEl.classList.remove('show');
+        closeSettings();
+      }
+    });
+
+    // Старт
+    resetGame(true);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
 </body>
 </html>
