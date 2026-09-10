@@ -1,337 +1,435 @@
-import asyncio
-import logging
-from typing import Optional
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Крестики-нолики на 4 игрока</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-from aiogram import Bot, Dispatcher, F
-from aiogram.filters import Command
-from aiogram.types import (
-    Message,
-    CallbackQuery,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-)
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%);
+    color: #fff;
+    padding: 20px;
+  }
 
-# ==================== НАСТРОЙКИ ====================
-BOT_TOKEN = "8703910146:AAFsiwUMkkxAM0fLA-fT4rLjpsd_uxo3e-w"
-# ===================================================
+  .container {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+  }
 
+  h1 {
+    font-size: 26px;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, #ff4d6d, #4d9bff, #4dff88, #ffd24d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-# ==================== ЛОГИКА ИГРЫ ====================
+  .subtitle {
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 20px;
+  }
 
-BOARD_SIZE = 5
-WIN_LENGTH = 4
+  /* Список игроков */
+  .players {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
 
-PLAYER_SYMBOLS = {
-    1: "🔴",
-    2: "🔵",
-    3: "🟢",
-    4: "🟡",
-}
+  .player {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 600;
+  }
 
-PLAYER_NAMES = {
-    1: "Красный",
-    2: "Синий",
-    3: "Зелёный",
-    4: "Жёлтый",
-}
+  .player.active {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px currentColor;
+    border-color: currentColor;
+  }
 
+  .player.winner {
+    animation: pulse 0.8s infinite alternate;
+  }
 
-class Game:
-    def __init__(self, players: list[int]):
-        if len(players) != 4:
-            raise ValueError("Нужно ровно 4 игрока")
+  @keyframes pulse {
+    from { box-shadow: 0 0 10px currentColor; }
+    to   { box-shadow: 0 0 30px currentColor, 0 0 50px currentColor; }
+  }
 
-        self.players = players
-        self.player_numbers = {uid: i + 1 for i, uid in enumerate(players)}
-        self.board = [[0] * BOARD_SIZE for _ in range(BOARD_SIZE)]
-        self.current_turn = 0
-        self.finished = False
-        self.winner: Optional[int] = None
-        self.is_draw = False
+  .dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 10px currentColor;
+  }
 
-    def current_player_id(self) -> int:
-        return self.players[self.current_turn]
+  .p1 { color: #ff4d6d; } .p1 .dot { background: #ff4d6d; }
+  .p2 { color: #4d9bff; } .p2 .dot { background: #4d9bff; }
+  .p3 { color: #4dff88; } .p3 .dot { background: #4dff88; }
+  .p4 { color: #ffd24d; } .p4 .dot { background: #ffd24d; }
 
-    def make_move(self, user_id: int, row: int, col: int) -> tuple[bool, str]:
-        if self.finished:
-            return False, "Игра уже завершена."
-        if user_id != self.current_player_id():
-            return False, "Сейчас не ваш ход."
-        if not (0 <= row < BOARD_SIZE and 0 <= col < BOARD_SIZE):
-            return False, "Неверные координаты."
-        if self.board[row][col] != 0:
-            return False, "Клетка уже занята."
+  /* Поле */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin: 0 auto 20px;
+    max-width: 420px;
+  }
 
-        num = self.player_numbers[user_id]
-        self.board[row][col] = num
+  .cell {
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, 0.06);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-        if self._check_win(row, col, num):
-            self.finished = True
-            self.winner = user_id
-            return True, f"Победил {PLAYER_NAMES[num]}!"
+  .cell:hover:not(.taken) {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px);
+  }
 
-        if all(self.board[r][c] != 0 for r in range(BOARD_SIZE) for c in range(BOARD_SIZE)):
-            self.finished = True
-            self.is_draw = True
-            return True, "Ничья!"
+  .cell.taken { cursor: not-allowed; }
 
-        self.current_turn = (self.current_turn + 1) % len(self.players)
-        return True, "OK"
+  .mark {
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    animation: pop 0.3s ease;
+  }
 
-    def _check_win(self, row: int, col: int, player_num: int) -> bool:
-        directions = [(0, 1), (1, 0), (1, 1), (1, -1)]
-        for dr, dc in directions:
-            count = 1
-            r, c = row + dr, col + dc
-            while 0 <= r < BOARD_SIZE and 0 <= c < BOARD_SIZE and self.board[r][c] == player_num:
-                count += 1
-                r += dr
-                c += dc
-            r, c = row - dr, col - dc
-            while 0 <= r < BOARD_SIZE and 0 <= c < BOARD_SIZE and self.board[r][c] == player_num:
-                count += 1
-                r -= dr
-                c -= dc
-            if count >= WIN_LENGTH:
-                return True
-        return False
+  @keyframes pop {
+    0%   { transform: scale(0); opacity: 0; }
+    70%  { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+  }
 
-    def render_board(self) -> str:
-        header = "    " + " ".join(f"{i + 1}" for i in range(BOARD_SIZE))
-        lines = [header]
-        for r in range(BOARD_SIZE):
-            row_cells = []
-            for c in range(BOARD_SIZE):
-                val = self.board[r][c]
-                row_cells.append("⬜" if val == 0 else PLAYER_SYMBOLS[val])
-            lines.append(f"{r + 1}  " + " ".join(row_cells))
-        return "\n".join(lines)
+  .cell .mark.m1 { background: #ff4d6d; box-shadow: 0 0 20px #ff4d6d; }
+  .cell .mark.m2 { background: #4d9bff; box-shadow: 0 0 20px #4d9bff; }
+  .cell .mark.m3 { background: #4dff88; box-shadow: 0 0 20px #4dff88; }
+  .cell .mark.m4 { background: #ffd24d; box-shadow: 0 0 20px #ffd24d; }
 
-    def status_text(self) -> str:
-        if self.finished:
-            if self.is_draw:
-                return "🤝 Ничья!"
-            winner_num = self.player_numbers[self.winner]
-            return f"🏆 Победил {PLAYER_NAMES[winner_num]} {PLAYER_SYMBOLS[winner_num]}!"
-        num = self.player_numbers[self.current_player_id()]
-        return f"Ход: {PLAYER_NAMES[num]} {PLAYER_SYMBOLS[num]}"
+  .cell.win {
+    background: rgba(255, 255, 255, 0.2);
+    animation: winFlash 0.6s infinite alternate;
+  }
 
+  @keyframes winFlash {
+    from { transform: scale(1); }
+    to   { transform: scale(1.08); }
+  }
 
-# ==================== TELEGRAM БОТ ====================
+  /* Статус */
+  .status {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    min-height: 24px;
+  }
 
-logging.basicConfig(level=logging.INFO)
+  /* Кнопки */
+  .btn {
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #6a4dff, #4d9bff);
+    color: #fff;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 20px rgba(106, 77, 255, 0.4);
+  }
 
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher()
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(106, 77, 255, 0.6);
+  }
 
-active_games: dict[int, Game] = {}
-lobbies: dict[int, list[int]] = {}
+  .btn:active { transform: translateY(0); }
 
+  /* Оверлей */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
 
-def lobby_keyboard() -> InlineKeyboardMarkup:
-    kb = InlineKeyboardBuilder()
-    kb.button(text="✅ Присоединиться", callback_data="join")
-    kb.button(text="🚀 Начать игру", callback_data="start")
-    kb.button(text="❌ Отмена", callback_data="cancel")
-    kb.adjust(1)
-    return kb.as_markup()
+  .overlay.show { display: flex; }
 
+  .overlay-content {
+    background: #1e1e2f;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 400px;
+    animation: pop 0.4s ease;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+  }
 
-def game_keyboard(chat_id: int) -> InlineKeyboardMarkup:
-    kb = InlineKeyboardBuilder()
-    game = active_games.get(chat_id)
-    if game is None:
-        return kb.as_markup()
-    for r in range(BOARD_SIZE):
-        for c in range(BOARD_SIZE):
-            val = game.board[r][c]
-            text = "⬜" if val == 0 else PLAYER_SYMBOLS[val]
-            kb.button(text=text, callback_data=f"cell:{r}:{c}")
-    kb.adjust(BOARD_SIZE)
-    return kb.as_markup()
+  .overlay-content h2 {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
 
+  .overlay-content p {
+    color: #aaa;
+    margin-bottom: 24px;
+  }
 
-def lobby_text(chat_id: int) -> str:
-    players = lobbies.get(chat_id, [])
-    lines = ["🎮 <b>Крестики-нолики на 4 игрока</b>", ""]
-    lines.append("Игроки (нужно 4):")
-    for i in range(4):
-        num = i + 1
-        if i < len(players):
-            uid = players[i]
-            lines.append(f"{PLAYER_SYMBOLS[num]} <a href='tg://user?id={uid}'>Игрок {num}</a> ✅")
-        else:
-            lines.append(f"{PLAYER_SYMBOLS[num]} Игрок {num} — свободно")
-    lines.append("")
-    lines.append("Правила: поле 5×5, соберите <b>4 в ряд</b> (горизонталь, вертикаль, диагональ).")
-    return "\n".join(lines)
+  @media (max-width: 500px) {
+    .container { padding: 20px; }
+    h1 { font-size: 20px; }
+    .players { grid-template-columns: 1fr; }
+    .player { font-size: 13px; padding: 8px 12px; }
+  }
+</style>
+</head>
+<body>
 
+<div class="container">
+  <h1>Крестики-нолики на 4 игрока</h1>
+  <p class="subtitle">Поле 5×5 · Собери 4 в ряд по горизонтали, вертикали или диагонали</p>
 
-def game_text(game: Game) -> str:
-    return (
-        f"🎮 <b>Игра началась!</b>\n\n"
-        f"{game.render_board()}\n\n"
-        f"{game.status_text()}"
-    )
+  <div class="players">
+    <div class="player p1" id="player1"><div class="dot"></div>Красный</div>
+    <div class="player p2" id="player2"><div class="dot"></div>Синий</div>
+    <div class="player p3" id="player3"><div class="dot"></div>Зелёный</div>
+    <div class="player p4" id="player4"><div class="dot"></div>Жёлтый</div>
+  </div>
 
+  <div class="status" id="status">Ход: 🔴 Красный</div>
 
-@dp.message(Command("start"))
-async def cmd_start(message: Message):
-    await message.answer(
-        "Привет! 👋\n\n"
-        "Это бот для игры в <b>крестики-нолики на 4 игрока</b>.\n"
-        "Поле 5×5, побеждает тот, кто первым соберёт 4 в ряд.\n\n"
-        "Команды:\n"
-        "/newgame — создать лобби\n"
-        "/cancel — отменить игру"
-    )
+  <div class="board" id="board"></div>
 
+  <button class="btn" onclick="resetGame()">🔄 Новая игра</button>
+</div>
 
-@dp.message(Command("newgame"))
-async def cmd_newgame(message: Message):
-    chat_id = message.chat.id
-    if chat_id in active_games:
-        await message.answer("Игра уже идёт! Завершите её или напишите /cancel.")
-        return
-    if chat_id in lobbies:
-        await message.answer("Лобби уже создано. Присоединяйтесь!")
-        return
+<div class="overlay" id="overlay">
+  <div class="overlay-content">
+    <h2 id="overlayTitle">Победа!</h2>
+    <p id="overlayText"></p>
+    <button class="btn" onclick="resetGame()">🔄 Играть снова</button>
+  </div>
+</div>
 
-    lobbies[chat_id] = []
-    await message.answer(
-        lobby_text(chat_id),
-        reply_markup=lobby_keyboard(),
-        parse_mode="HTML",
-    )
+<script>
+  const SIZE = 5;
+  const WIN_LENGTH = 4;
 
+  const COLORS = {
+    1: { name: 'Красный', hex: '#ff4d6d', emoji: '🔴' },
+    2: { name: 'Синий',   hex: '#4d9bff', emoji: '🔵' },
+    3: { name: 'Зелёный', hex: '#4dff88', emoji: '🟢' },
+    4: { name: 'Жёлтый',  hex: '#ffd24d', emoji: '🟡' },
+  };
 
-@dp.message(Command("cancel"))
-async def cmd_cancel(message: Message):
-    chat_id = message.chat.id
-    removed = False
-    if chat_id in lobbies:
-        del lobbies[chat_id]
-        removed = True
-    if chat_id in active_games:
-        del active_games[chat_id]
-        removed = True
-    await message.answer("Игра/лобби отменены. ❌" if removed else "Нечего отменять.")
+  let board = [];
+  let currentPlayer = 1;
+  let finished = false;
+  let boardEl;
+  let statusEl;
+  let overlayEl;
+  let overlayTitleEl;
+  let overlayTextEl;
+  let playerEls = {};
 
+  function initGame() {
+    boardEl = document.getElementById('board');
+    statusEl = document.getElementById('status');
+    overlayEl = document.getElementById('overlay');
+    overlayTitleEl = document.getElementById('overlayTitle');
+    overlayTextEl = document.getElementById('overlayText');
 
-@dp.callback_query(F.data == "join")
-async def on_join(cb: CallbackQuery):
-    chat_id = cb.message.chat.id
-    if chat_id not in lobbies:
-        await cb.answer("Лобби не найдено.", show_alert=True)
-        return
-    players = lobbies[chat_id]
-    if cb.from_user.id in players:
-        await cb.answer("Вы уже в игре.", show_alert=True)
-        return
-    if len(players) >= 4:
-        await cb.answer("Все места заняты!", show_alert=True)
-        return
+    playerEls = {
+      1: document.getElementById('player1'),
+      2: document.getElementById('player2'),
+      3: document.getElementById('player3'),
+      4: document.getElementById('player4'),
+    };
 
-    players.append(cb.from_user.id)
-    await cb.answer("Вы присоединились!")
-    try:
-        await cb.message.edit_text(
-            lobby_text(chat_id),
-            reply_markup=lobby_keyboard(),
-            parse_mode="HTML",
-        )
-    except Exception:
-        pass
+    resetGame();
+  }
 
+  function resetGame() {
+    board = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+    currentPlayer = 1;
+    finished = false;
 
-@dp.callback_query(F.data == "start")
-async def on_start(cb: CallbackQuery):
-    chat_id = cb.message.chat.id
-    if chat_id not in lobbies:
-        await cb.answer("Лобби не найдено.", show_alert=True)
-        return
-    players = lobbies[chat_id]
-    if len(players) < 4:
-        await cb.answer(f"Нужно 4 игрока, сейчас {len(players)}.", show_alert=True)
-        return
+    overlayEl.classList.remove('show');
+    Object.values(playerEls).forEach(el => el.classList.remove('active', 'winner'));
 
-    game = Game(players)
-    active_games[chat_id] = game
-    del lobbies[chat_id]
+    renderBoard();
+    updateStatus();
+  }
 
-    await cb.answer("Игра началась!")
-    try:
-        await cb.message.edit_text(
-            game_text(game),
-            reply_markup=game_keyboard(chat_id),
-            parse_mode="HTML",
-        )
-    except Exception:
-        await cb.message.answer(
-            game_text(game),
-            reply_markup=game_keyboard(chat_id),
-            parse_mode="HTML",
-        )
+  function renderBoard() {
+    boardEl.innerHTML = '';
 
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.row = r;
+        cell.dataset.col = c;
 
-@dp.callback_query(F.data == "cancel")
-async def on_cancel_lobby(cb: CallbackQuery):
-    chat_id = cb.message.chat.id
-    if chat_id in lobbies:
-        del lobbies[chat_id]
-    await cb.answer("Отменено.")
-    try:
-        await cb.message.edit_text("❌ Лобби отменено.")
-    except Exception:
-        pass
+        const val = board[r][c];
+        if (val !== 0) {
+          cell.classList.add('taken');
+          const mark = document.createElement('div');
+          mark.className = `mark m${val}`;
+          cell.appendChild(mark);
+        }
 
+        cell.addEventListener('click', () => handleClick(r, c));
+        boardEl.appendChild(cell);
+      }
+    }
+  }
 
-@dp.callback_query(F.data.startswith("cell:"))
-async def on_cell(cb: CallbackQuery):
-    chat_id = cb.message.chat.id
-    game = active_games.get(chat_id)
-    if game is None:
-        await cb.answer("Игра не найдена.", show_alert=True)
-        return
+  function handleClick(row, col) {
+    if (finished) return;
+    if (board[row][col] !== 0) return;
 
-    _, r_s, c_s = cb.data.split(":")
-    r, c = int(r_s), int(c_s)
+    board[row][col] = currentPlayer;
 
-    ok, msg = game.make_move(cb.from_user.id, r, c)
-    if not ok:
-        await cb.answer(msg, show_alert=True)
-        return
+    const cell = boardEl.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+    cell.classList.add('taken');
+    const mark = document.createElement('div');
+    mark.className = `mark m${currentPlayer}`;
+    cell.appendChild(mark);
 
-    await cb.answer()
+    const winCells = checkWin(row, col, currentPlayer);
+    if (winCells) {
+      finished = true;
+      winCells.forEach(([r, c]) => {
+        const cellEl = boardEl.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+        cellEl.classList.add('win');
+      });
+      showWinner(currentPlayer);
+      return;
+    }
 
-    text = game_text(game) if game.finished else (
-        f"🎮 <b>Игра идёт</b>\n\n{game.render_board()}\n\n{game.status_text()}"
-    )
+    if (board.flat().every(v => v !== 0)) {
+      finished = true;
+      showDraw();
+      return;
+    }
 
-    if game.finished:
-        try:
-            await cb.message.edit_text(text, parse_mode="HTML")
-        except Exception:
-            await cb.message.answer(text, parse_mode="HTML")
-        del active_games[chat_id]
-    else:
-        try:
-            await cb.message.edit_text(
-                text,
-                reply_markup=game_keyboard(chat_id),
-                parse_mode="HTML",
-            )
-        except Exception:
-            pass
+    currentPlayer = currentPlayer % 4 + 1;
+    updateStatus();
+  }
 
+  function checkWin(row, col, player) {
+    const directions = [
+      [0, 1],   // горизонталь
+      [1, 0],   // вертикаль
+      [1, 1],   // диагональ ↘
+      [1, -1],  // диагональ ↙
+    ];
 
-# ==================== ЗАПУСК ====================
+    for (const [dr, dc] of directions) {
+      const cells = [[row, col]];
 
-async def main():
-    print("Бот запущен...")
-    await dp.start_polling(bot)
+      // В одну сторону
+      let r = row + dr, c = col + dc;
+      while (inBounds(r, c) && board[r][c] === player) {
+        cells.push([r, c]);
+        r += dr; c += dc;
+      }
 
+      // В другую сторону
+      r = row - dr; c = col - dc;
+      while (inBounds(r, c) && board[r][c] === player) {
+        cells.push([r, c]);
+        r -= dr; c -= dc;
+      }
 
-if __name__ == "__main__":
-    asyncio.run(main())
+      if (cells.length >= WIN_LENGTH) return cells;
+    }
+
+    return null;
+  }
+
+  function inBounds(r, c) {
+    return r >= 0 && r < SIZE && c >= 0 && c < SIZE;
+  }
+
+  function updateStatus() {
+    const p = COLORS[currentPlayer];
+    statusEl.innerHTML = `Ход: ${p.emoji} <span style="color:${p.hex}">${p.name}</span>`;
+
+    Object.entries(playerEls).forEach(([num, el]) => {
+      el.classList.toggle('active', Number(num) === currentPlayer);
+    });
+  }
+
+  function showWinner(player) {
+    const p = COLORS[player];
+    statusEl.innerHTML = `🏆 Победил ${p.emoji} <span style="color:${p.hex}">${p.name}</span>!`;
+
+    playerEls[player].classList.add('winner');
+    Object.values(playerEls).forEach(el => el.classList.remove('active'));
+
+    overlayTitleEl.textContent = '🏆 Победа!';
+    overlayTitleEl.style.color = p.hex;
+    overlayTextEl.textContent = `${p.emoji} ${p.name} собрал 4 в ряд!`;
+
+    setTimeout(() => overlayEl.classList.add('show'), 600);
+  }
+
+  function showDraw() {
+    statusEl.textContent = '🤝 Ничья!';
+    Object.values(playerEls).forEach(el => el.classList.remove('active'));
+
+    overlayTitleEl.textContent = '🤝 Ничья!';
+    overlayTitleEl.style.color = '#fff';
+    overlayTextEl.textContent = 'Поле заполнено, победителя нет.';
+
+    setTimeout(() => overlayEl.classList.add('show'), 600);
+  }
+
+  // Запуск
+  initGame();
+</script>
+
+</body>
+</html>
